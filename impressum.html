@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<title>Impressum — Alexandru Hortolomei</title>
+<meta name="description" content="Impressum und Anbieterkennzeichnung gemäß § 5 DDG — Alexandru Hortolomei, Visual Communication Designer.">
+<meta name="robots" content="noindex, follow">
+<style>
+  /* Schriften und Farbwelt identisch zur Hauptseite */
+  @font-face{
+    font-family:'Urbanist';
+    src:url('assets/fonts/Urbanist-Regular.ttf') format('truetype');
+    font-weight:400;font-style:normal;font-display:swap;
+  }
+  @font-face{
+    font-family:'Urbanist';
+    src:url('assets/fonts/Urbanist-Medium.ttf') format('truetype');
+    font-weight:500;font-style:normal;font-display:swap;
+  }
+  @font-face{
+    font-family:'Urbanist';
+    src:url('assets/fonts/Urbanist-Medium.ttf') format('truetype');
+    font-weight:600 700;font-style:normal;font-display:swap;
+  }
+
+  :root{
+    --ink:#1f2027;
+    --paper:#f9f9f9;
+    --line:#dcdcdc;
+    --accent:#5869b6;
+    --accent-soft:#d5d9ec;
+    --max:1180px;
+    --topbar-h:64px;
+  }
+  *{box-sizing:border-box;}
+  html,body{overflow-x:hidden;}
+  body{
+    margin:0;
+    background:var(--paper);color:var(--ink);
+    font-family:'Urbanist',system-ui,-apple-system,sans-serif;
+    font-weight:400;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit;}
+
+  /* TOPBAR — gleicher Aufbau wie auf der Hauptseite */
+  .topbar{
+    position:fixed;top:0;left:0;right:0;z-index:110;height:var(--topbar-h);
+    display:flex;align-items:center;justify-content:space-between;
+    padding:0 28px;
+    background:var(--paper);
+    border-bottom:1px solid var(--line);
+  }
+  .brand{display:flex;align-items:center;gap:11px;height:34px;text-decoration:none;}
+  .brand-mark{height:30px;width:auto;display:block;flex-shrink:0;}
+  .brand-full{
+    height:28px;width:auto;display:block;flex-shrink:0;
+    opacity:0;transform:translateX(-6px);
+    transition:opacity .35s ease, transform .35s cubic-bezier(.22,1,.36,1);
+  }
+  .brand:hover .brand-full,
+  .brand:focus-visible .brand-full{opacity:1;transform:translateX(0);}
+  .lang-toggle{
+    display:inline-flex;align-items:center;justify-content:center;
+    min-width:42px;height:32px;padding:0 12px;
+    border:1px solid var(--ink);border-radius:100px;
+    background:none;font-family:'Urbanist',sans-serif;font-size:12px;font-weight:600;
+    letter-spacing:.04em;cursor:pointer;color:var(--ink);
+    transition:background .2s ease,color .2s ease;
+  }
+  .lang-toggle:hover{background:var(--ink);color:var(--paper);}
+
+  /* SEITE */
+  .legal{padding:calc(var(--topbar-h) + 72px) 28px 110px;}
+  .legal-wrap{position:relative;max-width:var(--max);margin:0 auto;}
+
+  .legal-close{
+    position:absolute;top:4px;right:0;
+    width:44px;height:44px;border-radius:50%;
+    display:inline-flex;align-items:center;justify-content:center;
+    border:1px solid var(--line);
+    font-size:22px;line-height:1;text-decoration:none;color:var(--ink);
+    background:var(--paper);
+    transition:background .2s ease,color .2s ease,border-color .2s ease;
+  }
+  .legal-close:hover,.legal-close:focus-visible{
+    background:var(--ink);border-color:var(--ink);color:var(--paper);
+  }
+
+  .legal h1{
+    font-weight:500;letter-spacing:-0.025em;line-height:1;
+    font-size:clamp(40px,6vw,76px);
+    margin:0 0 48px;
+    max-width:calc(100% - 70px);
+  }
+
+  /* Kopfblock: Angaben links, Zeichnung rechts */
+  .legal-top{
+    display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.78fr);
+    gap:56px;align-items:start;
+    margin-bottom:12px;
+  }
+  .legal-illu{justify-self:center;width:100%;max-width:400px;}
+  .legal-illu img{width:100%;height:auto;display:block;}
+
+  .legal h2{
+    font-size:17px;font-weight:600;letter-spacing:-0.005em;
+    margin:40px 0 14px;
+  }
+  .legal-top h2:first-child{margin-top:0;}
+  .legal p{
+    margin:0 0 18px;
+    font-size:17px;line-height:1.62;color:#3a3d47;
+    max-width:74ch;
+  }
+  .legal-adr{line-height:1.55;}
+  .legal a:not(.legal-close):not(.brand):not(.btn){
+    color:var(--accent);
+    text-decoration:underline;
+    text-underline-offset:3px;
+    text-decoration-thickness:1px;
+    transition:color .2s ease;
+  }
+  .legal a:not(.legal-close):not(.brand):not(.btn):hover{color:var(--ink);}
+
+  /* identisch zum Hero-Button der Hauptseite */
+  .btn{
+    display:inline-flex;align-items:center;gap:8px;
+    padding:14px 26px;border-radius:100px;
+    font-family:'Urbanist',sans-serif;font-size:14px;font-weight:500;text-decoration:none;
+    border:1px solid var(--ink);
+    transition:background .2s ease,border-color .2s ease;
+  }
+  .btn-solid{background:var(--ink);color:var(--paper);}
+  .btn-solid:hover{background:var(--accent);border-color:var(--accent);}
+  .legal-back{margin-top:62px;}
+
+  @media(max-width:860px){
+    .legal-top{grid-template-columns:1fr;gap:34px;}
+    .legal-illu{max-width:260px;justify-self:start;order:-1;}
+  }
+  @media(max-width:600px){
+    .topbar{padding:0 18px;}
+    .legal{padding:calc(var(--topbar-h) + 44px) 18px 80px;}
+    .legal h1{margin-bottom:34px;max-width:calc(100% - 58px);}
+    .legal-close{width:38px;height:38px;font-size:19px;}
+    .legal p{font-size:16px;}
+    .legal-illu{max-width:200px;}
+  }
+  @media(max-width:420px){
+    .brand-mark{height:26px;}
+    .brand-full{display:none;}
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a href="index.html" class="brand" aria-label="Alexandru Hortolomei — Start">
+    <img class="brand-mark" src="assets/img/ui/logo-ah-mark.svg" alt="" aria-hidden="true">
+    <img class="brand-full" src="assets/img/ui/logo-ah-text.svg" alt="Alexandru Hortolomei">
+  </a>
+  <button class="lang-toggle" id="langToggle" aria-label="Sprache wechseln / Switch language">EN</button>
+</header>
+
+<main class="legal">
+  <div class="legal-wrap">
+
+    <a class="legal-close" href="index.html" aria-label="Impressum schließen" title="Schließen">&times;</a>
+
+    <h1 data-en="Legal notice">Impressum</h1>
+
+    <div class="legal-top">
+      <div>
+        <h2 data-en="Information pursuant to § 5 DDG">Angaben gemäß § 5 DDG</h2>
+        <p class="legal-adr">Alexandru Hortolomei<br>Bei der Bachbruck 6<br>78315 Radolfzell am Bodensee<br><span data-en="Germany">Deutschland</span></p>
+
+        <h2 data-en="Contact">Kontakt</h2>
+        <p class="legal-adr">
+          <span data-en="Email:">E-Mail:</span> <a href="mailto:hello@alexandruhortolomei.de">hello@alexandruhortolomei.de</a><br>
+          <span data-en="Phone:">Telefon:</span> 015734819050
+        </p>
+
+        <h2 data-en="Responsible for the content">Verantwortlich für den Inhalt</h2>
+        <p class="legal-adr">Alexandru Hortolomei<br>Bei der Bachbruck 6<br>78315 Radolfzell am Bodensee<br><span data-en="Germany">Deutschland</span></p>
+      </div>
+
+      <div class="legal-illu">
+        <img src="assets/img/ui/illu-impressum.svg" alt="" aria-hidden="true">
+      </div>
+    </div>
+
+    <h2 data-en="Liability for content">Haftung für Inhalte</h2>
+    <p data-en="As a service provider, I am responsible for my own content on this website in accordance with general legislation. However, I am not obliged to monitor transmitted or stored third-party information, or to investigate circumstances that indicate unlawful activity. Obligations to remove or block the use of information under general legislation remain unaffected by this.">Als Diensteanbieter bin ich gemäß den allgemeinen gesetzlichen Vorschriften für eigene Inhalte auf dieser Website verantwortlich. Ich bin jedoch nicht verpflichtet, übermittelte oder gespeicherte fremde Informationen zu überwachen oder nach Umständen zu suchen, die auf eine rechtswidrige Tätigkeit hinweisen. Verpflichtungen zur Entfernung oder Sperrung der Nutzung von Informationen nach den allgemeinen gesetzlichen Vorschriften bleiben hiervon unberührt.</p>
+
+    <h2 data-en="Liability for links">Haftung für Links</h2>
+    <p data-en="This website may contain links to external third-party websites. I have no influence over their content. The respective provider or operator of the linked pages is always responsible for their content.">Diese Website kann Links zu externen Websites Dritter enthalten. Auf deren Inhalte habe ich keinen Einfluss. Für die Inhalte der verlinkten Seiten ist stets der jeweilige Anbieter oder Betreiber verantwortlich.</p>
+    <p data-en="At the time of linking, no unlawful content was identifiable. Permanent monitoring of the content of linked pages is not reasonable without concrete evidence of an infringement.">Zum Zeitpunkt der Verlinkung waren keine rechtswidrigen Inhalte erkennbar. Eine permanente inhaltliche Kontrolle der verlinkten Seiten ist ohne konkrete Anhaltspunkte einer Rechtsverletzung nicht zumutbar.</p>
+    <p data-en="Should I become aware of any infringements, I will remove the links in question after examination.">Sollten mir Rechtsverletzungen bekannt werden, werde ich entsprechende Links nach Prüfung entfernen.</p>
+
+    <h2 data-en="Copyright">Urheberrecht</h2>
+    <p data-en="The content and works on this website, in particular texts, graphics, photographs, illustrations and designs, are protected by copyright. Reproduction, editing, distribution or any other use of this content is not permitted without my prior consent.">Die Inhalte und Werke dieser Website, insbesondere Texte, Grafiken, Fotografien, Illustrationen und Designs, sind urheberrechtlich geschützt. Die Vervielfältigung, Bearbeitung, Verbreitung oder sonstige Nutzung dieser Inhalte ist ohne meine vorherige Zustimmung nicht gestattet.</p>
+
+    <div class="legal-back">
+      <a class="btn btn-solid" href="index.html" data-en="Back to the website">Zurück zur Website</a>
+    </div>
+
+  </div>
+</main>
+
+<script>
+  /* Sprachumschaltung — gleiche Logik und gleicher Speicherschlüssel wie auf der Hauptseite,
+     damit die gewählte Sprache beim Wechsel zwischen den Seiten erhalten bleibt. */
+  (function(){
+    const langToggle = document.getElementById('langToggle');
+    let currentLang = 'de';
+    try { currentLang = localStorage.getItem('site-lang') || 'de'; } catch(e){}
+
+    function applyLang(lang){
+      currentLang = lang;
+      document.documentElement.setAttribute('lang', lang);
+      document.querySelectorAll('[data-en]').forEach(el => {
+        if (el.dataset.deCache === undefined) el.dataset.deCache = el.innerHTML;
+        el.innerHTML = lang === 'en' ? el.dataset.en : el.dataset.deCache;
+      });
+      document.title = (lang === 'en' ? 'Legal notice' : 'Impressum') + ' — Alexandru Hortolomei';
+      langToggle.textContent = lang === 'de' ? 'EN' : 'DE';
+      try { localStorage.setItem('site-lang', lang); } catch(e){}
+    }
+
+    langToggle.addEventListener('click', () => applyLang(currentLang === 'de' ? 'en' : 'de'));
+    applyLang(currentLang);
+
+    /* Escape schließt die Seite — gleiches Verhalten wie bei der Projektansicht */
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') window.location.href = 'index.html';
+    });
+  })();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,2243 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<title>Alexandru Hortolomei — Visual Communication Designer</title>
+<meta name="description" content="Visual Communication Designer für Strategie, Konzept, Art Direction, Branding, Editorial, Digital und generative KI.">
+<style>
+  /* URBANIST — lokal eingebunden (SIL Open Font License, siehe fonts/OFL.txt) */
+  @font-face{
+    font-family:'Urbanist';
+    src:url('assets/fonts/Urbanist-Regular.ttf') format('truetype');
+    font-weight:400;font-style:normal;font-display:swap;
+  }
+  @font-face{
+    font-family:'Urbanist';
+    src:url('assets/fonts/Urbanist-Medium.ttf') format('truetype');
+    font-weight:500;font-style:normal;font-display:swap;
+  }
+  /* Bold-Schnitte werden aus Medium synthetisiert – Urbanist Medium ist der
+     schwerste mitgelieferte Schnitt. */
+  @font-face{
+    font-family:'Urbanist';
+    src:url('assets/fonts/Urbanist-Medium.ttf') format('truetype');
+    font-weight:600 700;font-style:normal;font-display:swap;
+  }
+
+  :root{
+    --ink:#1f2027;
+    --paper:#f9f9f9;
+    --paper-2:#ececec;
+    --line:#dcdcdc;
+    /* --accent      die Akzentfarbe der Marke, auf hellem wie auf dunklem Grund
+       --accent-soft  Aufhellung für Rahmen und Flächen */
+    --accent:#5869b6;
+    --accent-soft:#d5d9ec;
+    --max:1180px;
+    --sidebar-w:220px;
+    --topbar-h:64px;
+  }
+  *{box-sizing:border-box;}
+  /* Die Sprungnavigation wird unten per JS mit eigener Dauer animiert,
+     damit sie etwas ruhiger läuft als der Browser-Standard. */
+  html{scroll-behavior:auto;}
+  html,body{overflow-x:hidden;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Urbanist',system-ui,sans-serif;
+    font-size:16.5px;
+    font-weight:400;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,h4{
+    font-family:'Urbanist',sans-serif;
+    font-weight:500;
+    line-height:1.08;
+    margin:0;
+    letter-spacing:-0.01em;
+  }
+  a{color:inherit;}
+  em,i{font-style:normal;}
+  .wrap{max-width:var(--max);margin:0 auto;padding:0 32px;position:relative;z-index:2;}
+  section{padding:120px 0;border-top:none;position:relative;}
+  section::before{
+    content:"";position:absolute;top:0;left:0;right:0;height:1px;
+    background:var(--line);
+    transform:scaleX(0);transform-origin:left;
+    transition:transform 2.2s cubic-bezier(.22,1,.36,1);
+  }
+  section.line-in::before{transform:scaleX(1);}
+  section:first-of-type::before{content:none;}
+
+  /* BACKGROUND STICKERS */
+  .sticker{
+    position:absolute;
+    display:flex;align-items:center;justify-content:center;
+    background:#fff;
+    border:1.5px solid var(--ink);
+    opacity:.3;
+    z-index:0;
+    pointer-events:none;
+    box-shadow:0 14px 30px -16px rgba(20,19,17,.5);
+  }
+  .sticker.round{border-radius:50%;}
+  .sticker.square{border-radius:16px;}
+  .sticker svg{width:48%;height:48%;}
+  .sticker-text{
+    font-family:'Urbanist',sans-serif;
+    font-size:10.5px;
+    line-height:1.3;
+    text-align:center;
+    text-transform:uppercase;
+    letter-spacing:.03em;
+    padding:14px;
+  }
+  .sticker-img{
+    position:absolute;
+    opacity:.3;
+    z-index:1;
+    pointer-events:none;
+  }
+  @media(max-width:900px){.sticker,.sticker-img{display:none;}}
+  .eyebrow{
+    font-size:13px;
+    text-transform:uppercase;
+    letter-spacing:.12em;
+    color:var(--accent);
+    font-weight:600;
+    margin-bottom:18px;
+    display:flex;align-items:center;gap:10px;
+  }
+  .eyebrow::before{content:"";width:22px;height:1px;background:var(--accent);display:inline-block;}
+
+  /* TOPBAR */
+  .topbar{
+    position:fixed;top:0;left:0;right:0;z-index:110;height:var(--topbar-h);
+    display:flex;align-items:center;justify-content:space-between;
+    padding:0 28px;
+    background:var(--paper);
+    border-bottom:1px solid var(--line);
+    transition:background .35s ease, box-shadow .35s ease, backdrop-filter .35s ease;
+  }
+  .topbar.scrolled{
+    background:rgba(246,243,238,.68);
+    backdrop-filter:blur(16px) saturate(160%);
+    -webkit-backdrop-filter:blur(16px) saturate(160%);
+    box-shadow:0 8px 24px -18px rgba(20,19,17,.35);
+  }
+  /* Standard: nur das AH-Signet. Beim Hover blendet der Namenszug
+     daneben ein und verschwindet wieder, sobald der Cursor die Marke verlässt. */
+  .brand{display:flex;align-items:center;gap:11px;height:34px;}
+  .brand-mark{height:30px;width:auto;display:block;flex-shrink:0;}
+  .brand-full{
+    height:28px;width:auto;display:block;flex-shrink:0;
+    opacity:0;transform:translateX(-6px);
+    transition:opacity .35s ease, transform .35s cubic-bezier(.22,1,.36,1);
+  }
+  .brand:hover .brand-full,
+  .brand:focus-visible .brand-full{opacity:1;transform:translateX(0);}
+  @media(max-width:420px){
+    .brand-mark{height:26px;}
+    .brand-full{display:none;}
+  }
+
+  /* INTRO: HORTDESIGN-Schriftzug unten links, löst sich nach oben auf */
+  .intro-overlay{
+    position:fixed;inset:0;z-index:9999;
+    background:var(--paper);
+    display:flex;align-items:flex-end;justify-content:flex-start;
+    padding:0 0 16vh 6vw;
+    transition:opacity .6s ease;
+  }
+  .intro-overlay.hide{opacity:0;pointer-events:none;}
+  /* Illustration nur im Intro-Screen zurückgenommen */
+  .intro-illu{
+    position:absolute;right:0;top:50%;
+    transform:translateY(-50%);
+    width:min(46vw,620px);height:auto;
+    opacity:.2;
+    pointer-events:none;
+  }
+  @media(max-width:700px){.intro-illu{width:74vw;right:-10%;}}
+  .intro-logo{
+    opacity:0;
+    transform:translateY(14px);
+    -webkit-mask-image:linear-gradient(to bottom, transparent 0%, #000 42%, #000 100%);
+    mask-image:linear-gradient(to bottom, transparent 0%, #000 42%, #000 100%);
+    -webkit-mask-size:100% 280%;mask-size:100% 280%;
+    -webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;
+    -webkit-mask-position:0% 100%;mask-position:0% 100%;
+    will-change:transform,opacity;
+  }
+  .intro-logo img{
+    display:block;
+    width:min(30vw,360px);
+    min-width:220px;
+    height:auto;
+  }
+  .intro-logo.reveal{
+    opacity:1;transform:translateY(0);
+    transition:opacity .85s ease, transform .85s cubic-bezier(.22,1,.36,1);
+  }
+  .intro-logo.dissolve{
+    transform:translateY(-110px);
+    filter:blur(5px);
+    opacity:0;
+    -webkit-mask-position:0% 0%;mask-position:0% 0%;
+    transition:transform .8s cubic-bezier(.65,0,.35,1),
+               -webkit-mask-position .8s cubic-bezier(.65,0,.35,1),
+               mask-position .8s cubic-bezier(.65,0,.35,1),
+               filter .8s ease,
+               opacity .8s ease;
+  }
+  @media(max-width:600px){
+    .intro-overlay{padding:0 0 20vh 8vw;}
+    .intro-logo img{width:64vw;}
+  }
+  @media(prefers-reduced-motion: reduce){
+    .intro-overlay{display:none;}
+  }
+  .topbar-right{display:flex;align-items:center;gap:14px;}
+  .lang-toggle{
+    display:inline-flex;align-items:center;justify-content:center;
+    min-width:42px;height:32px;padding:0 12px;
+    border:1px solid var(--ink);border-radius:100px;
+    background:none;font-family:'Urbanist',sans-serif;font-size:12px;font-weight:600;
+    letter-spacing:.04em;cursor:pointer;color:var(--ink);
+    transition:background .2s ease,color .2s ease;
+  }
+  .lang-toggle:hover{background:var(--ink);color:var(--paper);}
+  .navtoggle{display:none;background:none;border:none;font-size:22px;cursor:pointer;}
+
+  /* SIDENAV */
+  .sidenav{
+    position:fixed;top:var(--topbar-h);left:0;bottom:0;width:var(--sidebar-w);z-index:100;
+    border-right:1px solid var(--line);
+    background:var(--paper);
+    display:flex;flex-direction:column;justify-content:center;gap:16px;
+    padding:0 0 0 34px;
+  }
+  .sidenav a{
+    font-size:14px;font-weight:500;text-decoration:none;color:#8b8d99;
+    position:relative;width:fit-content;padding:4px 0;
+    transition:color .2s ease;
+  }
+  .sidenav a.active,.sidenav a:hover{color:var(--ink);font-weight:600;}
+  .sidenav a.active::before{
+    content:"";position:absolute;left:-18px;top:50%;transform:translateY(-50%);
+    width:6px;height:6px;border-radius:50%;background:var(--accent);
+  }
+
+  /* MAIN CONTENT OFFSET */
+  .main-content{margin-left:var(--sidebar-w);padding-top:var(--topbar-h);}
+
+  @media(max-width:900px){
+    .topbar{padding:0 20px;}
+    .navtoggle{display:block;}
+    .sidenav{
+      top:var(--topbar-h);left:0;right:0;bottom:auto;width:auto;height:auto;
+      flex-direction:column;align-items:flex-start;
+      padding:20px 28px 26px;gap:14px;
+      border-right:none;border-bottom:1px solid var(--line);
+      transform:translateY(-130%);transition:transform .3s ease;
+    }
+    .sidenav.open{transform:translateY(0);}
+    .sidenav a.active::before{left:auto;right:100%;margin-right:10px;}
+    .main-content{margin-left:0;}
+  }
+
+  /* HERO */
+  .hero{padding-top:56px;padding-bottom:70px;border-top:none;position:relative;}
+  .hero .kicker{
+    display:flex;align-items:center;gap:14px;
+    font-size:14.5px;color:#3a3d47;font-weight:400;
+    margin:0 0 30px;max-width:520px;line-height:1.45;
+  }
+  .kicker-icon{
+    width:40px;height:auto;flex:none;display:block;
+  }
+  .hero h1{
+    font-size:clamp(32px,4.3vw,56px);max-width:620px;
+    text-transform:none;
+    font-weight:500;
+    letter-spacing:-0.022em;
+    line-height:1.14;
+  }
+  .hero-h1 .h1-static{display:block;}
+  .hero-h1 .h1-type{
+    display:block;color:var(--accent);
+    min-height:1.14em;
+  }
+  /* ruhiger Cursor — kein hektisches Blinken */
+  .type-caret{
+    display:inline-block;width:2px;height:.82em;
+    margin-left:3px;vertical-align:-.06em;
+    background:var(--accent);
+    animation:caretFade 1.4s ease-in-out infinite;
+  }
+  @keyframes caretFade{0%,45%{opacity:1;}60%,100%{opacity:.15;}}
+  @media(prefers-reduced-motion: reduce){
+    .type-caret{animation:none;opacity:.4;}
+  }
+  .hero h1 em{
+    font-style:normal;color:var(--accent);
+  }
+  .hero .lede{
+    max-width:440px;margin-top:26px;font-size:16px;color:#3a3d47;
+  }
+  .hero .lede + .lede{margin-top:14px;}
+  .hero .cta-row{display:flex;gap:14px;margin-top:36px;flex-wrap:wrap;}
+  .btn{
+    display:inline-flex;align-items:center;gap:8px;
+    padding:14px 26px;border-radius:100px;
+    font-family:'Urbanist',sans-serif;font-size:14px;font-weight:500;text-decoration:none;
+    border:1px solid var(--ink);
+  }
+  .btn-solid{background:var(--ink);color:var(--paper);}
+  .btn-solid:hover{background:var(--accent);border-color:var(--accent);}
+  .btn-ghost:hover{background:var(--ink);color:var(--paper);}
+
+  .hero-grid{display:grid;grid-template-columns:.95fr 1.05fr;gap:12px;align-items:center;}
+  .hero-copy{max-width:480px;position:relative;z-index:2;}
+  .hero-portrait{position:relative;justify-self:end;width:100%;max-width:600px;}
+  .hero-portrait img{
+    width:100%;display:block;
+  }
+  .hero-portrait .sticker{position:absolute;}
+  @media(max-width:980px){
+    .hero-grid{grid-template-columns:1fr;gap:0;}
+    .hero-copy{max-width:100%;}
+    .hero-portrait{justify-self:center;max-width:380px;margin:10px auto 0;order:-1;}
+  }
+
+  /* ABOUT */
+  .about-grid{display:grid;grid-template-columns:1fr 1.4fr;gap:70px;align-items:stretch;}
+  .about-intro{display:flex;flex-direction:column;}
+  .about-grid h2{font-size:clamp(26px,3.4vw,40px);max-width:420px;}
+  .about-tagline{color:var(--accent);font-weight:600;font-size:14px;margin:14px 0 0;}
+  .about-copy p{font-size:18px;color:#262933;margin:0 0 22px;}
+  .about-copy p:last-child{margin-bottom:0;}
+  @media(max-width:860px){.about-grid{grid-template-columns:1fr;gap:30px;}}
+
+  /* Kennzahlen unten in der linken Spalte */
+  .about-stats{
+    display:grid;grid-template-columns:repeat(3,1fr);
+    column-gap:20px;
+    align-items:start;
+    margin-top:auto;padding-top:56px;
+  }
+  .about-stats .stat{display:flex;flex-direction:column;gap:8px;}
+  .about-stats .stat-num{
+    font-family:'Urbanist',sans-serif;font-weight:700;
+    font-size:clamp(34px,3.4vw,46px);color:var(--accent);line-height:1;
+  }
+  .about-stats .stat-label{font-size:14px;color:#3a3d47;line-height:1.3;}
+  @media(max-width:860px){.about-stats{margin-top:0;padding-top:40px;}}
+  @media(max-width:520px){
+    .about-stats{column-gap:14px;}
+    .about-stats .stat-num{font-size:clamp(26px,8vw,34px);}
+    .about-stats .stat-label{font-size:12.5px;}
+  }
+
+  /* WORK — Editorial-Grid: die Arbeiten bilden eine zusammenhängende Fläche */
+  .work-head{display:flex;justify-content:space-between;align-items:flex-start;gap:40px;flex-wrap:wrap;margin-bottom:64px;}
+  .work-head h2{font-size:clamp(26px,3.4vw,40px);max-width:520px;}
+  .filter-note{font-size:14px;color:#5c5f6b;max-width:330px;line-height:1.6;}
+
+  .work-gallery{
+    max-width:1180px;margin:0 auto;padding:0 40px;
+    display:flex;flex-direction:column;
+  }
+  /* Eine Zeile = justierte Reihe. Jede Arbeit bekommt ihr Seitenverhältnis
+     als flex-grow — dadurch stehen die Bilder randlos nebeneinander,
+     ohne dass eines beschnitten wird. */
+  .work-row{display:flex;width:100%;}
+
+  .work-item{
+    position:relative;
+    flex:var(--ratio,1) 1 0;
+    min-width:0;
+    display:block;
+    cursor:pointer;
+    overflow:hidden;
+    background:none;border:none;padding:0;
+    text-align:left;font:inherit;color:inherit;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .work-item img{
+    width:100%;height:auto;display:block;
+    transition:transform .6s cubic-bezier(.22,1,.36,1);
+  }
+
+  /* Hover: nur ein ruhiger Hinweis, dass die Arbeit geöffnet werden kann */
+  .work-overlay{
+    position:absolute;inset:0;z-index:2;
+    display:flex;flex-direction:column;justify-content:flex-end;
+    padding:24px 26px;
+    background:linear-gradient(to top, rgba(20,19,17,.72) 0%, rgba(20,19,17,.18) 42%, transparent 72%);
+    opacity:0;
+    transition:opacity .35s ease;
+    color:var(--paper);
+  }
+  .work-overlay .w-cat{
+    font-size:11px;text-transform:uppercase;letter-spacing:.13em;
+    color:rgba(249,249,249,.72);margin:0 0 6px;
+  }
+  .work-overlay .w-title{
+    font-size:clamp(15px,1.35vw,19px);font-weight:500;line-height:1.25;
+    margin:0;padding-right:44px;
+  }
+  .work-arrow{
+    position:absolute;right:24px;bottom:24px;
+    width:34px;height:34px;border-radius:50%;
+    background:var(--accent);
+    display:flex;align-items:center;justify-content:center;
+    transform:translateY(6px);
+    transition:transform .35s cubic-bezier(.22,1,.36,1);
+  }
+  .work-arrow svg{width:14px;height:14px;display:block;}
+  @media(hover:hover){
+    .work-item:hover .work-overlay{opacity:1;}
+    .work-item:hover .work-arrow{transform:translateY(0);}
+    .work-item:hover img{transform:scale(1.015);}
+  }
+  .work-item:focus-visible{outline:2px solid var(--accent);outline-offset:-4px;}
+  .work-item:focus-visible .work-overlay{opacity:1;}
+  .work-item:focus-visible .work-arrow{transform:translateY(0);}
+  /* Auf Touch-Geräten ist der Hinweis dauerhaft sichtbar */
+  @media(hover:none){
+    .work-overlay{opacity:1;background:linear-gradient(to top, rgba(20,19,17,.6) 0%, transparent 55%);}
+    .work-arrow{transform:none;}
+  }
+
+  @media(max-width:820px){
+    .work-gallery{padding:0 24px;}
+    /* Reihen brechen auf, jede Arbeit steht für sich */
+    .work-row{flex-direction:column;}
+    .work-item{flex:none;width:100%;}
+    .work-overlay{padding:20px;}
+  }
+  @media(prefers-reduced-motion: reduce){
+    .work-item img,.work-arrow,.work-overlay{transition:none;}
+    .work-item:hover img{transform:none;}
+  }
+
+  /* ROADMAP — drei Schritte horizontal, Pfeile zeigen die Abfolge */
+  .rm-head{max-width:640px;margin-bottom:26px;}
+  .rm-head h2{font-size:clamp(26px,3.4vw,40px);}
+  .rm-lead{margin:20px 0 0;font-size:16px;line-height:1.6;color:#3a3d47;max-width:52ch;}
+
+  .roadmap{position:relative;margin-top:64px;}
+
+  .rm-steps{
+    list-style:none;margin:0;padding:0;
+    display:grid;grid-template-columns:repeat(3,1fr);gap:56px;
+  }
+  .rm-step{
+    position:relative;
+    display:flex;flex-direction:column;align-items:flex-start;
+  }
+
+  /* Zahl + Pfeil in einer Zeile, Pfeil füllt den Rest */
+  .rm-numrow{
+    display:flex;align-items:center;gap:22px;
+    width:100%;margin-bottom:20px;
+  }
+  .rm-num{
+    flex:0 0 auto;
+    font-size:clamp(54px,6.6vw,92px);font-weight:500;line-height:.82;
+    letter-spacing:-0.035em;
+    color:var(--accent);
+    opacity:0;transform:translateY(14px);
+    transition:opacity .5s ease,transform .6s cubic-bezier(.22,1,.36,1);
+  }
+  .rm-step.is-active .rm-num{opacity:1;transform:none;}
+
+  .rm-arrow{
+    flex:1 1 auto;min-width:0;
+    height:22px;width:100%;
+    object-fit:contain;object-position:left center;
+    margin-right:-38px;
+    clip-path:inset(0 100% 0 0);
+    transition:clip-path .75s cubic-bezier(.4,0,.2,1) .12s;
+  }
+  .rm-step.is-active .rm-arrow{clip-path:inset(0 0 0 0);}
+
+  .rm-konfetti{
+    flex:0 0 auto;
+    width:clamp(44px,4.6vw,60px);height:auto;
+    margin-left:10px;
+    opacity:0;transform:scale(.6) rotate(-14deg);
+    transition:opacity .45s ease .25s,transform .6s cubic-bezier(.34,1.56,.64,1) .25s;
+  }
+  .rm-step.is-active .rm-konfetti{opacity:1;transform:none;}
+
+  .rm-title{
+    font-size:clamp(20px,2.2vw,27px);font-weight:500;
+    letter-spacing:-0.018em;line-height:1.1;margin:0;
+    color:var(--ink);
+    opacity:0;transform:translateY(10px);
+    transition:opacity .5s ease .06s,transform .55s cubic-bezier(.22,1,.36,1) .06s;
+  }
+  .rm-q{
+    margin:12px 0 0;font-size:15.5px;line-height:1.5;color:#3a3d47;max-width:30ch;
+    opacity:0;transform:translateY(10px);
+    transition:opacity .5s ease .12s,transform .55s cubic-bezier(.22,1,.36,1) .12s;
+  }
+  .rm-step.is-active .rm-title,
+  .rm-step.is-active .rm-q{opacity:1;transform:none;}
+
+  .rm-keys{
+    list-style:none;margin:24px 0 0;padding:0;
+    display:flex;flex-wrap:wrap;gap:8px;
+  }
+  .rm-keys li{
+    font-size:13px;line-height:1;color:#4c4f5a;
+    padding:8px 14px;border-radius:100px;
+    border:1px solid var(--accent-soft);background:#fff;
+    white-space:nowrap;
+    opacity:0;transform:translateY(7px);
+    transition:opacity .45s ease,transform .5s cubic-bezier(.22,1,.36,1);
+  }
+  .rm-step.is-active .rm-keys li{opacity:1;transform:none;}
+  .rm-step.is-active .rm-keys li:nth-child(2){transition-delay:.07s;}
+  .rm-step.is-active .rm-keys li:nth-child(3){transition-delay:.14s;}
+  .rm-step.is-active .rm-keys li:nth-child(4){transition-delay:.21s;}
+
+  /* Tablet: zwei Spalten wären unlogisch — also früh auf eine Spalte */
+  @media(max-width:880px){
+    .roadmap{margin-top:48px;}
+    .rm-steps{grid-template-columns:1fr;gap:12px;}
+    /* Zahl und Pfeil werden direkte Kinder des Schritts, Pfeil wandert ans Ende */
+    .rm-numrow{display:contents;}
+    .rm-num{order:1;font-size:clamp(46px,13vw,62px);margin-bottom:14px;}
+    .rm-title{order:2;}
+    .rm-q{order:3;max-width:34ch;}
+    .rm-keys{order:4;}
+    .rm-arrow{
+      order:5;
+      flex:none;width:74px;height:auto;margin:46px 0 50px 16px;
+      transform:rotate(90deg);transform-origin:center;
+    }
+    .rm-konfetti{order:5;margin:24px 0 0;width:52px;}
+  }
+  @media(max-width:420px){
+    .rm-keys li{font-size:12.5px;padding:7px 12px;}
+  }
+  @media(prefers-reduced-motion: reduce){
+    .rm-num,.rm-title,.rm-q,.rm-keys li,.rm-konfetti{opacity:1;transform:none;transition:none;}
+    .rm-arrow{clip-path:none;transition:none;}
+    @media(max-width:880px){.rm-arrow{transform:rotate(90deg);}}
+  }
+
+  /* TESTIMONIALS */
+  .quote-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:26px;}
+  @media(max-width:780px){.quote-grid{grid-template-columns:1fr;}}
+  .quote-card{border:1px solid var(--line);border-radius:14px;padding:32px;background:#fff;}
+  .quote-card .mark{font-family:'Urbanist',sans-serif;font-size:34px;color:var(--accent);display:block;line-height:1;margin-bottom:10px;}
+  .quote-card p{font-size:17px;line-height:1.55;margin:0;color:#202230;}
+  .quote-footer{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin-top:20px;}
+  .quote-card .who{font-size:14px;color:#5c5f6b;}
+  .quote-card .who b{color:var(--ink);}
+  .quote-link{
+    flex-shrink:0;display:flex;line-height:0;
+    color:var(--accent);
+    transition:color .25s ease, opacity .25s ease;
+    opacity:.85;
+  }
+  .quote-link svg{width:21px;height:21px;display:block;}
+  .quote-link:hover,.quote-link:focus-visible{color:var(--ink);opacity:1;}
+
+  /* CONTACT */
+  /* Kontakt: Telefonillustration als großflächiges, angeschnittenes Element */
+  #kontakt{overflow:hidden;}
+  .contact-box{
+    display:grid;grid-template-columns:1.1fr .9fr;gap:60px;align-items:start;
+    min-height:460px;
+  }
+  .contact-main{position:relative;z-index:2;}
+  .contact-box h2{font-size:clamp(28px,4vw,46px);max-width:520px;}
+  .availability{
+    margin:18px 0 0;max-width:480px;
+    font-size:14.5px;font-style:italic;line-height:1.5;
+    color:var(--accent);
+  }
+  .contact-links{display:flex;flex-wrap:wrap;gap:14px;margin-top:26px;}
+  .contact-visual{
+    position:absolute;
+    right:0;bottom:0;
+    width:min(56vw,830px);
+    z-index:0;
+    pointer-events:none;
+  }
+  .contact-visual img{
+    width:100%;height:auto;display:block;
+    /* Kabel endet bündig an der Footer-Kante, der Arm wird rechts angeschnitten */
+    transform:translate(4%,0);
+    transform-origin:bottom right;
+  }
+  @media(max-width:860px){
+    .contact-box{grid-template-columns:1fr;gap:30px;min-height:0;padding-bottom:200px;}
+    .contact-visual{width:min(86vw,460px);}
+    .contact-visual img{transform:translate(6%,0);}
+  }
+
+  /* Footer als dunkler Abschluss: Kontakt links, Links rechts */
+  footer{
+    position:relative;
+    background:var(--ink);
+    color:var(--paper);
+    padding:0;
+    overflow:hidden;
+  }
+  /* Zeichnung rechts, bricht unten aus dem Block heraus */
+  /* Zeichnung rückt neben die Headline statt in die Ecke */
+  /* Höhe statt Breite als Maß: die Zeichnung bleibt damit immer fast so hoch
+     wie der Block und wird unten sauber angeschnitten — unabhängig von der
+     Fensterbreite. Waagerecht hängt sie an der Blockmitte, nicht am Rand. */
+  .footer-illu{
+    position:absolute;left:50%;bottom:-5%;right:auto;
+    transform:translateX(-40%);
+    height:91%;width:auto;
+    opacity:.9;
+    pointer-events:none;z-index:0;
+  }
+  @media(max-width:900px){
+    .footer-illu{left:auto;right:-6%;bottom:-3%;transform:none;height:auto;width:min(58vw,300px);opacity:.55;}
+  }
+  .footer-inner{
+    position:relative;z-index:1;
+    max-width:1180px;margin:0 auto;padding:96px 40px 54px;
+    display:grid;
+    grid-template-columns:1fr auto;
+    grid-template-rows:auto auto;
+    column-gap:60px;row-gap:64px;
+    align-items:start;
+  }
+  .footer-head{
+    font-size:clamp(28px,3.6vw,46px);line-height:1.08;
+    letter-spacing:-0.022em;margin:0;max-width:14ch;
+    color:var(--paper);font-weight:500;
+  }
+  .footer-head em{font-style:normal;color:var(--accent);}
+  .footer-sub{
+    margin:22px 0 0;max-width:38ch;
+    font-size:15px;line-height:1.6;color:rgba(249,249,249,.62);
+  }
+  .footer-mail{
+    display:inline-flex;align-items:center;
+    margin-top:30px;padding:15px 28px;
+    border:1px solid rgba(249,249,249,.3);border-radius:100px;
+    font-size:14.5px;text-decoration:none;color:var(--paper);
+    transition:background .22s ease,color .22s ease,border-color .22s ease;
+  }
+  .footer-mail:hover,.footer-mail:focus-visible{
+    background:var(--paper);color:var(--ink);border-color:var(--paper);
+  }
+  .footer-links{
+    display:flex;flex-direction:column;align-items:flex-end;gap:12px;
+    padding-top:6px;
+  }
+  .footer-links a{
+    font-size:13.5px;text-decoration:none;
+    color:rgba(249,249,249,.55);
+    transition:color .2s ease;
+  }
+  .footer-links a:hover,.footer-links a:focus-visible{color:var(--paper);}
+  .footer-copy{
+    grid-column:2;justify-self:end;
+    margin:0;font-size:12.5px;color:rgba(249,249,249,.35);
+  }
+  @media(max-width:760px){
+    .footer-inner{
+      grid-template-columns:1fr;row-gap:44px;
+      padding:76px 24px 40px;
+    }
+    .footer-links{align-items:flex-start;}
+    .footer-copy{grid-column:1;justify-self:start;}
+  }
+
+  .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);}
+
+  /* CASE STUDY — Beschreibung oben, darunter alle Bilder in gleicher Breite */
+  .case{
+    position:fixed;inset:0;z-index:300;
+    display:none;
+    background:var(--paper);
+    overflow-y:auto;overflow-x:hidden;
+    opacity:0;
+    transition:opacity .45s ease;
+  }
+  .case.open{display:block;}
+  .case.is-visible{opacity:1;}
+
+  .case-close{
+    position:fixed;top:26px;right:28px;z-index:320;
+    width:46px;height:46px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-size:20px;line-height:1;cursor:pointer;
+    border:1px solid rgba(249,249,249,.4);
+    background:rgba(20,19,17,.35);color:var(--paper);
+    backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+    transition:background .2s ease,color .2s ease,border-color .2s ease;
+  }
+  .case-close:hover{background:var(--paper);color:var(--ink);border-color:var(--paper);}
+  .case-close.on-light{
+    border-color:rgba(34,36,46,.3);background:rgba(255,255,255,.7);color:var(--ink);
+  }
+  .case-close.on-light:hover{background:var(--ink);color:var(--paper);}
+
+  /* PROJEKT-AUFTAKT — zwei Spalten, senkrechte Trennlinie dazwischen.
+     Links Titel und Kurzbeschreibung, rechts die Leistungen nach Kategorien.
+     Hintergrund und Typografie sind für alle Projekte identisch; nur Titel,
+     Beschreibung und Leistungen wechseln. */
+  .case-hero{
+    position:relative;
+    background:#17181c;
+    color:var(--paper);
+    padding:clamp(104px,11vw,156px) 0 clamp(96px,10vw,146px);
+    overflow:hidden;
+  }
+  /* Trennlinie: läuft über die volle Höhe der Section, nicht nur neben dem Text */
+  .case-hero::before{
+    content:"";position:absolute;top:0;bottom:0;left:50%;
+    width:1px;background:rgba(249,249,249,.15);
+  }
+  .case-hero-inner{
+    position:relative;z-index:1;
+    max-width:1320px;margin:0 auto;
+    padding:0 clamp(26px,6vw,104px);
+    display:grid;grid-template-columns:1fr 1fr;gap:0;align-items:start;
+  }
+  .case-meta{padding-right:clamp(26px,5vw,78px);}
+  .case-title{
+    font-size:clamp(30px,4.4vw,56px);line-height:1.08;font-weight:500;
+    letter-spacing:-0.024em;margin:0;max-width:15ch;
+  }
+  .case-intro{
+    font-size:16px;line-height:1.72;margin:30px 0 0;
+    color:rgba(249,249,249,.66);max-width:52ch;
+  }
+
+  .case-services{padding-left:clamp(26px,5vw,78px);}
+  .case-services-head{
+    font-size:clamp(20px,2.1vw,26px);font-weight:500;letter-spacing:-0.012em;
+    margin:0;line-height:1.1;
+  }
+  .case-services-sub{
+    font-size:13px;line-height:1.5;margin:8px 0 0;
+    color:rgba(249,249,249,.5);
+  }
+  .case-service-grid{
+    display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:36px 34px;margin-top:clamp(34px,4vw,52px);
+  }
+  .case-sgroup h4{
+    font-size:13px;font-weight:500;letter-spacing:.005em;
+    margin:0 0 13px;color:var(--paper);
+  }
+  .case-sgroup ul{list-style:none;margin:0;padding:0;}
+  .case-sgroup li{
+    font-size:13px;line-height:1.78;
+    color:rgba(249,249,249,.56);
+  }
+
+  /* Mobil: untereinander statt nebeneinander, Trennlinie entfällt */
+  @media(max-width:900px){
+    .case-hero::before{display:none;}
+    .case-hero-inner{grid-template-columns:1fr;gap:52px;}
+    .case-meta{padding-right:0;}
+    .case-services{
+      padding-left:0;padding-top:46px;
+      border-top:1px solid rgba(249,249,249,.15);
+    }
+    .case-title{max-width:20ch;}
+    .case-intro{max-width:62ch;}
+  }
+  @media(max-width:520px){
+    .case-service-grid{grid-template-columns:1fr;gap:30px;}
+    .case-intro,.case-sgroup li,.case-sgroup h4{font-size:14px;}
+    .case-sgroup li{font-size:13.5px;}
+  }
+
+  /* Unterprojekt innerhalb einer Sammlung — Nummer und Titel links, Text rechts.
+     Trennt mehrere Kunden klar voneinander, ohne sie zu vermischen. */
+  .case-chapter{
+    display:grid;grid-template-columns:1fr 1fr;gap:clamp(26px,5vw,78px);
+    align-items:start;
+    padding:clamp(82px,9vw,128px) 0 clamp(30px,3.6vw,48px);
+    border-top:1px solid var(--line);
+    margin-top:clamp(64px,7vw,104px);
+  }
+  .case-chapter:first-child{margin-top:0;border-top:0;padding-top:clamp(56px,6vw,84px);}
+  .case-chapter-num{
+    font-size:12px;letter-spacing:.16em;font-weight:500;
+    color:var(--accent);margin:0 0 14px;
+  }
+  .case-chapter-title{
+    font-size:clamp(24px,3.2vw,38px);font-weight:500;line-height:1.12;
+    letter-spacing:-0.02em;margin:0;color:var(--ink);max-width:14ch;
+  }
+  .case-chapter-sub{
+    font-size:14px;line-height:1.4;margin:12px 0 0;color:#6b6e79;
+  }
+  .case-chapter-text{
+    font-size:16px;line-height:1.72;margin:0;color:#3a3d47;max-width:52ch;
+  }
+  .case-chapter + .case-figure{padding-top:clamp(26px,3vw,40px);}
+  @media(max-width:760px){
+    .case-chapter{grid-template-columns:1fr;gap:20px;}
+    .case-chapter-title{max-width:22ch;}
+  }
+
+  /* BROSCHÜREN-READER
+     Auslöser und Vollbildansicht teilen denselben Geräterahmen — beim Tippen
+     wächst derselbe Bildschirm auf, und darin wird gescrollt. */
+  .case-readers{
+    display:grid;grid-template-columns:1fr 1fr;
+    gap:clamp(26px,4vw,62px);
+    padding:clamp(44px,5vw,68px) 0 0;
+  }
+  .reader-trigger{
+    display:block;width:100%;padding:0;margin:0;
+    border:0;background:none;cursor:pointer;text-align:left;
+    font-family:'Urbanist',sans-serif;color:inherit;
+  }
+
+  /* Geräterahmen — trägt Auslöser und Vollbildansicht gleichermaßen */
+  .rd-device{
+    display:block;position:relative;
+    background:#17181c;
+    border-radius:clamp(13px,1.8vw,24px);
+    padding:clamp(9px,1.1vw,15px);
+    box-shadow:0 28px 64px -30px rgba(20,19,17,.55);
+    transition:transform .45s cubic-bezier(.22,1,.36,1), box-shadow .45s ease;
+  }
+  .rd-device::before{
+    content:"";position:absolute;left:50%;top:clamp(4px,.5vw,7px);
+    width:4px;height:4px;margin-left:-2px;border-radius:50%;
+    background:#3a3c44;
+  }
+  .rd-screen{
+    display:block;position:relative;overflow:hidden;
+    border-radius:clamp(5px,.7vw,10px);
+    background:#fff;
+  }
+  .rd-screen img{width:100%;height:auto;display:block;}
+  .reader-trigger:hover .rd-device,
+  .reader-trigger:focus-visible .rd-device{
+    transform:translateY(-6px);
+    box-shadow:0 36px 72px -30px rgba(20,19,17,.6);
+  }
+
+  .reader-hint{
+    display:flex;align-items:center;gap:10px;margin:20px 0 0;
+    font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;
+    color:#8b8d99;transition:color .25s ease;
+  }
+  .reader-trigger:hover .reader-hint,
+  .reader-trigger:focus-visible .reader-hint{color:var(--accent);}
+  .reader-hint svg{width:13px;height:13px;flex:0 0 auto;}
+  @media(max-width:700px){.case-readers{grid-template-columns:1fr;gap:46px;}}
+
+  /* VOLLBILDANSICHT — derselbe Rahmen, nur groß. Gescrollt wird im Bildschirm. */
+  .reader{
+    position:fixed;inset:0;z-index:400;display:none;
+    background:rgba(16,17,21,.9);
+    -webkit-backdrop-filter:blur(7px);backdrop-filter:blur(7px);
+    opacity:0;transition:opacity .35s ease;
+  }
+  .reader.open{display:flex;align-items:center;justify-content:center;}
+  .reader.is-visible{opacity:1;}
+  /* Hochformat wie die Broschüre selbst — die Höhe gibt das Maß vor,
+     die Breite folgt dem Seitenverhältnis. */
+  .reader .rd-device{
+    height:min(88vh,1120px);
+    width:auto;aspect-ratio:707/1000;max-width:94vw;min-width:0;
+    display:flex;flex-direction:column;
+    margin-top:16px;
+    box-shadow:0 40px 90px -40px rgba(0,0,0,.8);
+  }
+  .reader .rd-device:hover{transform:none;}
+  .reader .rd-screen{
+    flex:1 1 auto;min-height:0;
+    overflow-y:auto;overflow-x:hidden;
+    overscroll-behavior:contain;
+    -webkit-overflow-scrolling:touch;
+    background:#ededee;
+    /* Leiste ausgeblendet, gescrollt wird weiterhin nativ —
+       die Seitenzählung oben zeigt an, wo man ist */
+    scrollbar-width:none;-ms-overflow-style:none;
+  }
+  .reader .rd-screen::-webkit-scrollbar{display:none;}
+  .reader-page{width:100%;height:auto;display:block;background:#fff;}
+  .reader-page + .reader-page{margin-top:10px;}
+
+  .reader-bar{
+    position:fixed;top:0;left:0;right:0;height:68px;z-index:1;
+    display:flex;align-items:center;justify-content:space-between;gap:16px;
+    padding:0 20px;color:var(--paper);pointer-events:none;
+  }
+  .reader-label{
+    font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;
+    color:rgba(249,249,249,.8);
+  }
+  .reader-count{
+    margin-left:auto;margin-right:16px;
+    font-size:11.5px;letter-spacing:.1em;
+    color:rgba(249,249,249,.55);font-variant-numeric:tabular-nums;
+  }
+  @media(max-width:520px){.reader-label{display:none;}}
+  .reader-close{
+    pointer-events:auto;
+    width:46px;height:46px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-size:20px;line-height:1;cursor:pointer;
+    font-family:'Urbanist',sans-serif;
+    border:1px solid rgba(249,249,249,.42);
+    background:rgba(20,19,17,.45);color:var(--paper);
+    transition:background .2s ease,color .2s ease,border-color .2s ease;
+  }
+  .reader-close:hover,.reader-close:focus-visible{
+    background:var(--paper);color:var(--ink);border-color:var(--paper);
+  }
+  .case.reader-offen{overflow:hidden;}
+
+  @media(max-width:700px){
+    .reader .rd-device{
+      height:92vh;max-width:96vw;margin-top:22px;
+      padding:7px;border-radius:15px;
+    }
+    .reader .rd-screen{border-radius:8px;}
+    .reader-page + .reader-page{margin-top:7px;}
+    .reader-bar{height:60px;padding:0 14px;}
+    .reader-close{width:40px;height:40px;font-size:18px;}
+  }
+  @media(prefers-reduced-motion: reduce){
+    .reader{transition:none;}
+    .rd-device{transition:none;}
+    .reader-trigger:hover .rd-device{transform:none;}
+  }
+
+  /* Bildgruppe: mehrere Seiten nebeneinander, die auf schmalen Schirmen
+     untereinander laufen. Jede Seite ist eine eigene Datei, damit sie auf
+     Mobil die volle Breite bekommt. */
+  .case-group{
+    display:grid;
+    gap:clamp(14px,1.8vw,26px);
+    padding:clamp(40px,5vw,56px) 0 0;
+  }
+  .case-group.is-2{grid-template-columns:repeat(2,minmax(0,1fr));}
+  .case-group.is-3{grid-template-columns:repeat(3,minmax(0,1fr));}
+  .case-group img{
+    width:100%;height:auto;display:block;
+    border:1px solid #e6e6e6;
+  }
+  /* Tablet: dreispaltige Gruppen auf zwei Spalten */
+  @media(max-width:900px){
+    .case-group.is-3{grid-template-columns:repeat(2,minmax(0,1fr));}
+  }
+  /* Mobil: immer eine Spalte, jede Seite über die volle Breite */
+  @media(max-width:700px){
+    .case-group.is-2,
+    .case-group.is-3{grid-template-columns:1fr;gap:18px;}
+    .case-group{padding-top:32px;}
+  }
+
+  /* Abschluss: ein Satz und ein Link zur Website des Kunden */
+  .case-cta{
+    display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;
+    gap:clamp(18px,3vw,34px);
+    margin-top:clamp(64px,7vw,104px);
+    padding:clamp(54px,6vw,84px) 0 0;
+    border-top:1px solid var(--line);
+  }
+  .case-cta p{
+    font-size:clamp(19px,2.3vw,28px);font-weight:500;line-height:1.25;
+    letter-spacing:-0.018em;margin:0;color:var(--ink);
+  }
+  .case-cta .btn{text-decoration:none;}
+
+  /* Bildstrecke: eine Spalte, alle Bilder exakt gleich breit,
+     jedes behält sein eigenes Seitenverhältnis */
+  .case-body{
+    max-width:1180px;margin:0 auto;padding:0 40px;
+  }
+  .case-figure{margin:0;padding:56px 0 0;}
+  .case-figure:first-child{padding-top:72px;}
+  .case-figure img{
+    width:100%;height:auto;display:block;
+  }
+  /* Kurze Notiz unter einer Abbildung — wechselt die Seite,
+     damit die Strecke nicht monoton läuft */
+  .case-caption{
+    display:grid;grid-template-columns:repeat(2,1fr);
+    padding:34px 0 10px;
+  }
+  .case-caption > div{grid-column:2;max-width:46ch;}
+  .case-caption.is-left > div{grid-column:1;}
+  .case-caption h3{
+    font-size:15px;font-weight:500;line-height:1.3;margin:0 0 10px;
+    color:var(--ink);
+  }
+  .case-caption p{
+    font-size:13.5px;line-height:1.65;margin:0;color:#5c5f6b;
+  }
+  .case-caption .tags{
+    margin:12px 0 0;font-size:12px;letter-spacing:.06em;
+    color:var(--accent);
+  }
+  @media(max-width:700px){
+    .case-caption{grid-template-columns:1fr;padding-top:24px;}
+    .case-caption > div,.case-caption.is-left > div{grid-column:1;}
+  }
+
+  .case-outro{
+    max-width:1180px;margin:0 auto;padding:96px 40px 120px;
+  }
+  .case-outro .case-back{
+    display:inline-flex;align-items:center;gap:10px;
+    font-size:14px;font-weight:500;cursor:pointer;
+    padding:14px 26px;border-radius:100px;
+    border:1px solid var(--ink);background:none;color:var(--ink);
+    font-family:'Urbanist',sans-serif;
+    transition:background .2s ease,color .2s ease;
+  }
+  .case-outro .case-back:hover{background:var(--ink);color:var(--paper);}
+
+  @media(max-width:900px){
+    .case-body,.case-outro{padding-left:24px;padding-right:24px;}
+    .case-figure{padding-top:34px;}
+    .case-figure:first-child{padding-top:44px;}
+    .case-outro{padding-top:64px;}
+  }
+  @media(prefers-reduced-motion: reduce){
+    .case{transition:none;}
+  }
+
+</style>
+</head>
+<body>
+
+<!-- INTRO-LOGO-ANIMATION -->
+<div class="intro-overlay" id="introOverlay" aria-hidden="true">
+  <img class="intro-illu" src="assets/img/ui/illu4-persona.png" alt="" aria-hidden="true">
+  <div class="intro-logo" id="introLogo">
+    <img src="assets/img/ui/logo-ah.svg" alt="Alexandru Hortolomei">
+  </div>
+</div>
+
+<header class="topbar">
+  <a href="#start" class="brand" aria-label="Alexandru Hortolomei — Start">
+    <img class="brand-mark" src="assets/img/ui/logo-ah-mark.svg" alt="" aria-hidden="true">
+    <img class="brand-full" src="assets/img/ui/logo-ah-text.svg" alt="Alexandru Hortolomei">
+  </a>
+  <div class="topbar-right">
+    <button class="lang-toggle" id="langToggle" aria-label="Sprache wechseln / Switch language">EN</button>
+    <button class="navtoggle" id="navToggle" aria-label="Menü öffnen">☰</button>
+  </div>
+</header>
+
+<nav class="sidenav" id="sideNav">
+  <a href="#ueber-mich" data-en="About">Über mich</a>
+  <a href="#design-denken" data-en="Design Thinking">Design Denken</a>
+  <a href="#arbeiten" data-en="Work">Ausgewählte Arbeiten</a>
+  <a href="#testimonials" data-en="Testimonials">Testimonials</a>
+  <a href="#kontakt-footer" data-en="Contact">Kontakt</a>
+</nav>
+
+<div class="main-content">
+
+<!-- HERO -->
+<header class="hero" id="start">
+  <div class="wrap">
+    <div class="hero-grid">
+      <div class="hero-copy">
+        <p class="kicker">
+          <img class="kicker-icon" src="assets/img/ui/icon-frauenkirche.svg" alt="" aria-hidden="true">
+          <span data-en="Hey, I&#39;m Alex, Visual Communication Designer — and moving to Dresden soon.">Hey, ich bin Alex, Visual Communication Designer — und ziehe bald nach Dresden.</span>
+        </p>
+
+        <h1 class="hero-h1">
+          <span class="h1-static" data-en="I turn complex ideas into">Ich übersetze komplexe Ideen in</span>
+          <span class="h1-type"><span id="typeOut"></span><span class="type-caret" aria-hidden="true"></span></span>
+        </h1>
+
+        <div class="cta-row">
+          <a href="#arbeiten" class="btn btn-solid" data-en="View selected work">Ausgewählte Arbeiten</a>
+          <a href="#kontakt-footer" class="btn btn-ghost" data-en="Let&#39;s work together">Projekt anfragen</a>
+        </div>
+      </div>
+
+      <div class="hero-portrait">
+        <img src="assets/img/ui/illu4-persona.png" alt="" loading="eager" aria-hidden="true">
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ÜBER MICH -->
+<section id="ueber-mich">
+  <img class="sticker-img" src="assets/img/ui/st3-ueber-mich.svg" alt="" style="width:134px;top:18px;left:28px;transform:rotate(-8deg);" aria-hidden="true">
+  <div class="wrap about-grid">
+    <div class="about-intro">
+      <h2 data-en="Between strategy, ideas and execution.">Zwischen Strategie, Idee und Umsetzung.</h2>
+
+      <div class="about-stats">
+        <div class="stat">
+          <span class="stat-num"><span class="num" data-count="5">5</span>+</span>
+          <span class="stat-label" data-en="Years of experience">Jahre Erfahrung</span>
+        </div>
+        <div class="stat">
+          <span class="stat-num"><span class="num" data-count="50">50</span>+</span>
+          <span class="stat-label" data-en="Completed projects">Abgeschlossene Projekte</span>
+        </div>
+        <div class="stat">
+          <span class="stat-num"><span class="num" data-count="15">15</span>+</span>
+          <span class="stat-label" data-en="Clients">Kunden</span>
+        </div>
+      </div>
+    </div>
+    <div class="about-copy">
+      <p data-en="I work across strategy, concept and visual design to turn complex ideas into clear, distinctive communication.">Ich arbeite an der Schnittstelle von Strategie, Konzept und visueller Gestaltung und übersetze komplexe Ideen in klare, eigenständige Kommunikation.</p>
+      <p data-en="My practice spans brand identities, campaigns, digital experiences and editorial design through to AI-assisted workflows.">Mein Spektrum reicht von Markenidentitäten und Kampagnen über digitale Erlebnisse und Editorial Design bis hin zu KI-gestützten Workflows.</p>
+      <p data-en="I use generative AI as a tool inside that process — for key visuals and image worlds, for landing pages and newsletter concepts, and to move faster from idea to execution. Art direction and the design decision stay with me.">Generative KI setze ich dabei als Werkzeug innerhalb dieses Prozesses ein — für Key Visuals und Bildwelten, für Landingpages und Newsletter-Konzepte, und um schneller vom Gedanken zur Umsetzung zu kommen. Art Direction und gestalterische Entscheidung bleiben bei mir.</p>
+      <p data-en="Drawing is an important part of how I think. It allows me to explore ideas directly, develop original visual systems and create forms that feel designed rather than assembled.">Zeichnung ist dabei ein wichtiger Bestandteil meiner Arbeitsweise. Sie hilft mir, Ideen direkt zu entwickeln, eigene visuelle Systeme zu schaffen und Formen zu gestalten, die nicht beliebig oder zusammengesetzt wirken.</p>
+      <p data-en="I enjoy working where disciplines overlap — where a brand becomes a digital experience, where a campaign becomes a visual system, or where a simple sketch develops into something much bigger.">Besonders interessant wird Gestaltung für mich dort, wo Disziplinen ineinandergreifen – wenn eine Marke zu einem digitalen Erlebnis wird, eine Kampagne zu einem visuellen System oder aus einer einfachen Skizze eine größere Idee entsteht.</p>
+    </div>
+  </div>
+</section>
+
+
+
+
+
+
+
+<!-- ROADMAP -->
+<section id="design-denken">
+  <div class="wrap">
+    <div class="rm-head">
+      <p class="eyebrow" data-en="How a project runs with me">Wie ein Projekt bei mir abläuft</p>
+      <h2 data-en="From the question to the finished solution.">Von der Frage zur fertigen Lösung.</h2>
+      <p class="rm-lead" data-en="Three steps, always in this order. Understand the problem first, then develop the idea — and only then design.">Drei Schritte, immer in dieser Reihenfolge. Erst das Problem verstehen, dann die Idee entwickeln — und erst danach gestalten.</p>
+    </div>
+
+    <div class="roadmap" id="roadmap">
+      <ol class="rm-steps">
+        <li class="rm-step">
+          <div class="rm-numrow">
+            <span class="rm-num" aria-hidden="true">01</span>
+            <img class="rm-arrow" src="assets/img/ui/rm-pfeil.svg" alt="" aria-hidden="true">
+          </div>
+          <h3 class="rm-title" data-en="Brief">Briefing</h3>
+          <p class="rm-q" data-en="What needs to be understood?">Was soll verstanden werden?</p>
+          <ul class="rm-keys"><li data-en="Problem">Problem</li><li data-en="Context">Kontext</li><li data-en="Audience">Zielgruppe</li><li data-en="Communication">Kommunikation</li></ul>
+        </li>
+        <li class="rm-step">
+          <div class="rm-numrow">
+            <span class="rm-num" aria-hidden="true">02</span>
+            <img class="rm-arrow" src="assets/img/ui/rm-pfeil.svg" alt="" aria-hidden="true">
+          </div>
+          <h3 class="rm-title" data-en="Concept">Konzept</h3>
+          <p class="rm-q" data-en="What is the idea?">Was ist die Idee?</p>
+          <ul class="rm-keys"><li data-en="First ideas">Erste Ideen</li><li data-en="Form">Form</li><li data-en="Variations">Varianten</li><li data-en="Direction">Richtung</li></ul>
+        </li>
+        <li class="rm-step">
+          <div class="rm-numrow">
+            <span class="rm-num" aria-hidden="true">03</span>
+            <img class="rm-konfetti" src="assets/img/ui/rm-konfetti.svg" alt="" aria-hidden="true">
+          </div>
+          <h3 class="rm-title" data-en="Build">Bauen</h3>
+          <p class="rm-q" data-en="What should come out of it?">Was soll daraus entstehen?</p>
+          <ul class="rm-keys"><li data-en="System">System</li><li data-en="Typography">Typografie</li><li data-en="Grid">Raster</li><li data-en="Application">Anwendung</li></ul>
+        </li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- AUSGEWÄHLTE ARBEITEN -->
+<section id="arbeiten">
+  <img class="sticker-img" src="assets/img/ui/st3-arbeiten.svg" alt="" style="width:126px;top:34px;right:28px;transform:rotate(6deg);" aria-hidden="true">
+  <div class="wrap">
+    <div class="work-head">
+      <h2 data-en="Selective Works">Ausgewählte Arbeiten</h2>
+      <p class="filter-note" data-en="Different briefs. One shared ambition: to make ideas visible and usable.">Unterschiedliche Aufgaben. Ein gemeinsamer Anspruch: Ideen sichtbar und anwendbar machen.</p>
+    </div>
+  </div>
+
+  <div class="work-gallery">
+    <div class="work-row">
+      <div class="work-item" style="--ratio:1.697" data-gallery="houts"
+           role="button" tabindex="0" aria-label="HOUTS — Eine visuelle Identität für ein modulares Produktsystem öffnen">
+        <img src="assets/img/teaser/w-houts-visitenkarte.jpg" alt="HOUTS Geschäftsausstattung" loading="lazy">
+        <span class="work-overlay">
+          <span class="w-cat" data-en="Brand strategy · Identity · Product design">Markenstrategie · Identität · Produktdesign</span>
+          <span class="w-title" data-en="HOUTS — Building a visual identity for a modular product system">HOUTS — Eine visuelle Identität für ein modulares Produktsystem</span>
+          <span class="work-arrow"><svg viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3 11L11 3M11 3H4.5M11 3V9.5" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </span>
+      </div>
+      <div class="work-item" style="--ratio:0.954" data-gallery="yoga"
+           role="button" tabindex="0" aria-label="Online Yoga Akademie — Markenidentität öffnen">
+        <img src="assets/img/teaser/w-yoga-kampagne.jpg" alt="Online Yoga Akademie — Kampagnenmotiv" loading="lazy">
+        <span class="work-overlay">
+          <span class="w-cat" data-en="Branding · Design system · Brandbook">Branding · Design System · Brandbook</span>
+          <span class="w-title" data-en="Online Yoga Academy — Brand identity &amp; brandbook">Online Yoga Akademie — Markenidentität &amp; Brandbook</span>
+          <span class="work-arrow"><svg viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3 11L11 3M11 3H4.5M11 3V9.5" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </span>
+      </div>
+    </div>
+    <div class="work-row">
+      <div class="work-item" style="--ratio:1.257" data-gallery="aquares"
+           role="button" tabindex="0" aria-label="AQUARES — Ein Konzept von der Analyse bis zur Kampagne öffnen">
+        <img src="assets/img/teaser/w-aquares-editorial.jpg" alt="AQUARES Konzeptbuch" loading="lazy">
+        <span class="work-overlay">
+          <span class="w-cat" data-en="Editorial · Concept · Brand development">Editorial · Konzept · Markenentwicklung</span>
+          <span class="w-title" data-en="AQUARES — A concept from analysis through to campaign">AQUARES — Ein Konzept von der Analyse bis zur Kampagne</span>
+          <span class="work-arrow"><svg viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3 11L11 3M11 3H4.5M11 3V9.5" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </span>
+      </div>
+      <div class="work-item" style="--ratio:1.501" data-gallery="festival"
+           role="button" tabindex="0" aria-label="Eigenzeit — Eine Serie über Prozesse, die sich nicht beschleunigen lassen öffnen">
+        <img src="assets/img/teaser/w-eigenzeit-ocean.jpg" alt="Plakat Ocean aus der Serie Eigenzeit" loading="lazy">
+        <span class="work-overlay">
+          <span class="w-cat" data-en="Poster series · Concept · Art direction">Plakatserie · Konzept · Art Direction</span>
+          <span class="w-title" data-en="Eigenzeit — A series on processes that cannot be accelerated">Eigenzeit — Eine Serie über Prozesse, die sich nicht beschleunigen lassen</span>
+          <span class="work-arrow"><svg viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3 11L11 3M11 3H4.5M11 3V9.5" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </span>
+      </div>
+    </div>
+    <div class="work-row">
+      <div class="work-item" style="--ratio:1.324" data-gallery="avelura"
+           role="button" tabindex="0" aria-label="Print &amp; Geschäftsausstattung öffnen">
+        <img src="assets/img/teaser/w-avelura-flyer.jpg" alt="Printarbeiten — Avelura Falzflyer" loading="lazy">
+        <span class="work-overlay">
+          <span class="w-cat" data-en="Print · Editorial · Brand applications">Print · Editorial · Geschäftsausstattung</span>
+          <span class="w-title" data-en="Print &amp; Brand Applications — a selection">Print &amp; Geschäftsausstattung — eine Auswahl</span>
+          <span class="work-arrow"><svg viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3 11L11 3M11 3H4.5M11 3V9.5" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </span>
+      </div>
+      <div class="work-item" style="--ratio:1.501" data-gallery="safsbeta"
+           role="button" tabindex="0" aria-label="Ein System für viele Ausbildungen öffnen">
+        <img src="assets/img/teaser/w-safsbeta.jpg" alt="SAFS &amp; BETA Broschüren auf Tablets" loading="lazy">
+        <span class="work-overlay">
+          <span class="w-cat" data-en="Editorial design · Design system · Print design">Editorial Design · Design System · Print Design</span>
+          <span class="w-title" data-en="One system for many programmes">Ein System für viele Ausbildungen</span>
+          <span class="work-arrow"><svg viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3 11L11 3M11 3H4.5M11 3V9.5" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </span>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- TESTIMONIALS -->
+<section id="testimonials">
+  <img class="sticker-img" src="assets/img/ui/st3-testimonials.svg" alt="" style="width:118px;top:24px;right:28px;transform:rotate(-7deg);" aria-hidden="true">
+  <div class="wrap">
+    <h2 style="font-size:clamp(26px,3.4vw,40px);max-width:560px;margin-bottom:50px;" data-en="Collaboration that lasts.">Zusammenarbeit, die bleibt.</h2>
+    <div class="quote-grid">
+      <div class="quote-card">
+        <span class="mark">“</span>
+        <p data-en="Working with Alexandru was a great experience. Communication was clear, fast, and easy throughout the entire process. The final result exceeded my expectations as I received a beautifully designed logo in all the necessary formats, and it perfectly meets everything I hoped for.">Die Zusammenarbeit mit Alexandru war eine großartige Erfahrung. Die Kommunikation war während des gesamten Prozesses klar, schnell und unkompliziert. Das Endergebnis hat meine Erwartungen übertroffen – ich habe ein wunderschön gestaltetes Logo in allen benötigten Formaten erhalten, das genau meinen Vorstellungen entspricht.</p>
+        <div class="quote-footer">
+          <div class="who" data-en="&lt;b&gt;Daria Makhova&lt;/b&gt; &#183; &lt;em&gt;Senior E-Commerce &amp; Performance Marketing Manager&lt;/em&gt;"><b>Daria Makhova</b> · <em>Senior E-Commerce &amp; Performance Marketing Manager</em></div>
+          <a class="quote-link" href="https://www.linkedin.com/in/daria-makhova-ab782a97/" target="_blank" rel="noopener" aria-label="LinkedIn-Profil von Daria Makhova ansehen">
+            <svg viewBox="3 3 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.47-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28ZM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13Zm1.78 13.02H3.55V9h3.57v11.45Z" fill="currentColor"/></svg>
+          </a>
+        </div>
+      </div>
+      <div class="quote-card">
+        <span class="mark">“</span>
+        <p data-en="Every time I work with Alex I&#39;m impressed. He understands the brief, delivers at a high level and makes the whole project a pleasure. Not just technically flawless, but on the same wavelength as a person. That&#39;s what I want from every partner.">Jedes Mal, wenn ich mit Alex arbeite, bin ich begeistert. Er versteht die Anforderung, liefert auf hohem Niveau und macht das ganze Projekt zur Freude. Nicht nur handwerklich perfekt, sondern auch menschlich auf einer Wellenlänge. Das wünsche ich mir von jedem Partner.</p>
+        <div class="quote-footer">
+          <div class="who" data-en="&lt;b&gt;Fabian Dalhoff&lt;/b&gt; &#183; &lt;em&gt;Mehrwertfilm&lt;/em&gt;"><b>Fabian Dalhoff</b> · <em>Mehrwertfilm</em></div>
+          <a class="quote-link" href="https://www.linkedin.com/in/fabian-dalhoff-96255a216/" target="_blank" rel="noopener" aria-label="LinkedIn-Profil von Fabian Dalhoff ansehen">
+            <svg viewBox="3 3 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.47-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28ZM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13Zm1.78 13.02H3.55V9h3.57v11.45Z" fill="currentColor"/></svg>
+          </a>
+        </div>
+      </div>
+      <div class="quote-card">
+        <span class="mark">“</span>
+        <p data-en="I work with Alexandru regularly and particularly appreciate his creative ideas, his dependable execution and the straightforward communication. Working together is always professional and on equal terms.">Ich arbeite regelmäßig mit Alexandru zusammen und schätze besonders seine kreativen Ideen, seine zuverlässige Umsetzung und die unkomplizierte Kommunikation. Die Zusammenarbeit ist immer professionell und auf Augenhöhe.</p>
+        <div class="quote-footer">
+          <div class="who" data-en="&lt;b&gt;Alexander Bauer&lt;/b&gt; &#183; &lt;em&gt;Online Marketing Manager&lt;/em&gt;"><b>Alexander Bauer</b> · <em>Online Marketing Manager</em></div>
+          <a class="quote-link" href="https://www.linkedin.com/in/a-b-marketing/" target="_blank" rel="noopener" aria-label="LinkedIn-Profil von Alexander Bauer ansehen">
+            <svg viewBox="3 3 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.47-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28ZM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13Zm1.78 13.02H3.55V9h3.57v11.45Z" fill="currentColor"/></svg>
+          </a>
+        </div>
+      </div>
+      <div class="quote-card">
+        <span class="mark">“</span>
+        <p data-en="It was impressive to see how Alex develops a complete visual concept out of a simple sketch. His ability to connect drawing and design gives his projects a signature of their own.">Ich fand es stark zu sehen, wie Alex aus einer einfachen Skizze ein komplettes visuelles Konzept entwickelt. Seine Fähigkeit, Zeichnung und Design miteinander zu verbinden, gibt seinen Projekten eine ganz eigene Handschrift.</p>
+        <div class="quote-footer">
+          <div class="who" data-en="&lt;b&gt;Alexandru Plecan&lt;/b&gt; &#183; &lt;em&gt;Engagement EMEA&lt;/em&gt;"><b>Alexandru Plecan</b> · <em>Engagement EMEA</em></div>
+          <a class="quote-link" href="https://www.linkedin.com/in/alexandru-plecan/" target="_blank" rel="noopener" aria-label="LinkedIn-Profil von Alexandru Plecan ansehen">
+            <svg viewBox="3 3 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.47-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28ZM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13Zm1.78 13.02H3.55V9h3.57v11.45Z" fill="currentColor"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+<footer id="kontakt-footer">
+  <div class="footer-inner">
+    <div class="footer-main">
+      <h2 class="footer-head" data-en="A project, an idea or a &lt;em&gt;challenge&lt;/em&gt;?">Ein Projekt, eine Idee oder eine <em>Herausforderung</em>?</h2>
+      <p class="footer-sub" data-en="Let's talk about brands, campaigns, digital experiences or visual systems.">Lass uns über Marken, Kampagnen, digitale Erlebnisse oder visuelle Systeme sprechen.</p>
+      <a class="footer-mail" href="mailto:hello@alexandruhortolomei.de?subject=Projektanfrage">hello@alexandruhortolomei.de</a>
+    </div>
+
+    <nav class="footer-links" aria-label="Weiterführende Links">
+      <a href="https://www.linkedin.com/in/alexandru-hortolomei-41234b1b1/" target="_blank" rel="noopener">LinkedIn <span aria-hidden="true">↗</span></a>
+      <a href="impressum.html">Impressum <span aria-hidden="true">↗</span></a>
+      <a href="datenschutz.html">Datenschutz <span aria-hidden="true">↗</span></a>
+    </nav>
+
+    <p class="footer-copy">© 2026 Alexandru Hortolomei</p>
+  </div>
+  <img class="footer-illu" src="assets/img/ui/illu4-kontakt.png" alt="" aria-hidden="true">
+</footer>
+
+</div><!-- /.main-content -->
+
+<!-- PROJEKTANSICHT / CASE STUDY -->
+<div class="case" id="caseView" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="caseTitle">
+  <button class="case-close" id="caseClose" aria-label="Projekt schließen">&times;</button>
+
+  <header class="case-hero" id="caseHero">
+    <div class="case-hero-inner">
+      <div class="case-meta">
+        <h2 class="case-title" id="caseTitle"></h2>
+        <p class="case-intro" id="caseIntro"></p>
+      </div>
+      <div class="case-services">
+        <h3 class="case-services-head" data-en="Services">Services</h3>
+        <p class="case-services-sub" data-en="What needs to be understood?">Was soll verstanden werden?</p>
+        <div class="case-service-grid" id="caseServices"></div>
+      </div>
+    </div>
+  </header>
+
+  <div class="case-body" id="caseBody"></div>
+
+  <div class="case-outro">
+    <button class="case-back" id="caseBack" data-en="Back to works">Zurück zur Übersicht</button>
+  </div>
+</div>
+
+<!-- BROSCHÜREN-READER: liegt über der Projektansicht -->
+<div class="reader" id="readerView" role="dialog" aria-modal="true" aria-hidden="true" aria-label="Broschüre">
+  <div class="reader-bar">
+    <span class="reader-label" id="readerLabel"></span>
+    <span class="reader-count" id="readerCount" aria-live="polite"></span>
+    <button class="reader-close" id="readerClose" aria-label="Broschüre schließen">&times;</button>
+  </div>
+  <div class="rd-device">
+    <div class="rd-screen" id="readerPages"></div>
+  </div>
+</div>
+
+<script>
+  // Aktuelle Sprache (de/en) — wird unten im zweiten Script-Block über den Button gesteuert.
+  // localStorage wirft in manchen Browsern bei lokal geöffneten Dateien (file://)
+  // eine SecurityError — ohne try/catch würde das den gesamten Block abbrechen.
+  let currentLang = 'de';
+  try { currentLang = localStorage.getItem('site-lang') || 'de'; } catch(e){}
+
+  /* Projektdaten für die Case-Study-Ansicht.
+     Neues Projekt: Kachel mit data-gallery="id" versehen und hier einen Eintrag ergänzen.
+     Ein Abschnitt ohne "note" bleibt bewusst textlos und zeigt nur das Bild. */
+  const projects = {
+
+    houts: {
+      eyebrow: { de: 'Branding · Corporate & Produktdesign', en: 'Branding · Corporate & Product Design' },
+      title: { de: 'HOUTS — Tasche & Markendesign.', en: 'HOUTS — Bag & Brand Design.' },
+      intro: {
+        de: 'HOUTS ist eine zeitgenössische Lifestyle-Marke rund um modulare Taschen aus veganem Apfelleder. Im Fokus stand eine reduzierte Markenidentität, die Nachhaltigkeit, Flexibilität und modernes urbanes Leben zusammenhält — vom Produkt über die Printebene bis in den Raum.',
+        en: 'HOUTS is a contemporary lifestyle brand built around modular bags made from vegan apple leather. The focus was a minimal brand identity holding together sustainability, flexibility and modern urban living — from the product through print to physical space.'
+      },
+      services: [
+        { label: 'Strategy',
+          items: { de: ['Recherche & Insights', 'Markenstrategie', 'Markenpositionierung'],
+                   en: ['Research & Insights', 'Brand Strategy', 'Market Positioning'] } },
+
+        { label: 'Identity',
+          items: { de: ['Corporate Design', 'Logogestaltung', 'Typografie & Farbkonzept', 'Visuelles Storytelling'],
+                   en: ['Corporate Design', 'Logo Design', 'Typography & Colour Concept', 'Visual Storytelling'] } },
+
+        { label: 'Product',
+          items: { de: ['Produktdesign', 'Technische Zeichnung', 'Prototyping'],
+                   en: ['Product Design', 'Technical Drawing', 'Prototyping'] } },
+
+        { label: 'Application',
+          items: { de: ['Geschäftsausstattung', 'Verpackungsdesign', 'Fassade & Beschilderung', 'Kampagnenmotive'],
+                   en: ['Stationery', 'Packaging Design', 'Façade & Signage', 'Campaign Motifs'] } },
+
+        { label: 'Digital',
+          items: { de: ['UX/UI Design', 'Webdesign'],
+                   en: ['UX/UI Design', 'Web Design'] } }
+      ],
+      hero: 'assets/img/cases/houts/cy-houts-01-hero.jpg',
+      sections: [
+        { note: { label: { de: 'Markenwelt', en: 'Brand world' },
+                  text: { de: 'Die Bildwelt setzt das Produkt konsequent in den urbanen Alltag: Glas, Beton, Bewegung. Schwarz-Weiß als Grundton, damit das Material der Tasche die einzige Textur im Bild bleibt.',
+                          en: 'The imagery places the product firmly in urban everyday life: glass, concrete, movement. Black and white as the base, so the bag’s material stays the only texture in frame.' } },
+          images: ['assets/img/cases/houts/cy-houts-02-moodboard.jpg'] },
+
+        { note: { label: { de: 'Vom Strich zur Form', en: 'From line to form' },
+                  text: { de: 'Jede Tragevariante wurde zuerst freihändig durchgespielt. Erst als die Proportionen im Skizzenblock stimmten, ging es in die technische Zeichnung und in den Prototypenbau.',
+                          en: 'Every carrying variant was explored freehand first. Only once the proportions worked on paper did it move into technical drawing and prototyping.' } },
+          images: ['assets/img/cases/houts/cy-houts-03-prozess.jpg'] },
+
+        { note: { label: { de: 'Zwei Taschen in einer', en: 'Two bags in one' },
+                  text: { de: 'Das Produktversprechen steht und fällt mit der Erklärbarkeit. Außen- und Innenansicht sind deshalb als annotierte Zeichnung angelegt — jede Funktion bekommt ihre eigene Linie.',
+                          en: 'The product promise stands or falls on being explainable. Outside and inside views are therefore laid out as annotated drawings — each function gets its own leader line.' } },
+          images: ['assets/img/cases/houts/cy-houts-04-aussen.jpg', 'assets/img/cases/houts/cy-houts-05-innen.jpg'] },
+
+        { note: { label: { de: 'Geschäftsausstattung', en: 'Stationery' },
+                  text: { de: 'Die Printebene übersetzt das Signet in den Alltag der Marke: strenges Schwarz-Weiß, klare Raster, viel Weißraum. Das Logo bleibt immer das lauteste Element auf der Fläche.',
+                          en: 'The print layer translates the mark into the brand’s daily use: strict black and white, clear grids, generous white space. The logo always stays the loudest element on the page.' } },
+          images: ['assets/img/cases/houts/cy-houts-06-visitenkarte.jpg', 'assets/img/cases/houts/cy-houts-07-briefbogen.jpg'] },
+
+        { images: ['assets/img/cases/houts/cy-houts-08-verpackung.jpg'] },
+
+        { note: { label: { de: 'Marke im Raum', en: 'Brand in space' },
+                  text: { de: 'Auf der Fassade und im Store trägt dieselbe Typografie — nur der Maßstab ändert sich. Das Signet funktioniert vom Visitenkartenformat bis zur Ladenbeschriftung.',
+                          en: 'The same typography carries the façade and the store — only the scale changes. The mark works from business-card size up to shop signage.' } },
+          images: ['assets/img/cases/houts/cy-houts-09-store.jpg'] },
+
+        { images: ['assets/img/cases/houts/cy-houts-10-kampagne.jpg'] },
+
+        { note: { label: { de: 'Digitale Ebene', en: 'Digital layer' },
+                  text: { de: 'Die Landingpage übersetzt das HOUTS-Designsystem ins Digitale und stellt Produkt, Funktion und Material in einer klaren, reduzierten Präsentation dar.',
+                          en: 'The landing page translates the HOUTS design system into digital, presenting product, function and material in a clear, reduced layout.' } },
+          images: ['assets/img/cases/houts/cy-houts-11-website.jpg'] }
+      ]
+    },
+
+    festival: {
+      eyebrow: { de: 'Plakatserie · Fineart im öffentlichen Raum', en: 'Poster series · Fine art in public space' },
+      title: { de: 'Eigenzeit.', en: 'Eigenzeit — time of its own.' },
+      intro: {
+        de: 'Eine dreiteilige Fineart-Plakatserie über Naturprozesse, die sich nicht beschleunigen lassen. Wasser, Erde und Feld — drei Elemente, die ihrem eigenen Tempo folgen, in einer Kultur, die auf Echtzeit eingestellt ist.',
+        en: 'A three-part fine-art poster series on natural processes that cannot be accelerated. Water, earth and field — three elements that follow a pace of their own, in a culture tuned to real time.'
+      },
+      services: [
+        { label: 'Concept',
+          items: { de: ['Serienkonzept', 'Bildidee', 'Art Direction'],
+                   en: ['Series Concept', 'Image Concept', 'Art Direction'] } },
+
+        { label: 'Design',
+          items: { de: ['Plakatgestaltung', 'Typografie', 'Komposition', 'Farbkonzept'],
+                   en: ['Poster Design', 'Typography', 'Composition', 'Colour Concept'] } },
+
+        { label: 'Illustration',
+          items: { de: ['Handzeichnung', 'Bildbearbeitung'],
+                   en: ['Hand Drawing', 'Image Editing'] } },
+
+        { label: 'Print',
+          items: { de: ['Druckproduktion', 'Format & Material'],
+                   en: ['Print Production', 'Format & Material'] } }
+      ],
+      hero: 'assets/img/cases/eigenzeit/ez-01-szene.jpg',
+      sections: [
+        { note: { label: { de: 'N° 06 — Manche Tiefen lassen sich nicht in Echtzeit denken.',
+                           en: 'N° 06 — Some depths cannot be thought in real time.' },
+                  text: { de: 'Der Ozean bedeckt mehr von diesem Planeten, als wir je vollständig erklärt haben. Er ist der stille Beweis dafür, dass nicht jede Tiefe sich in Echtzeit erschließt — manche Dinge brauchen Druck, Dunkelheit und Zeit, um zu entstehen.',
+                           en: 'The ocean covers more of this planet than we have ever fully explained. It is the quiet proof that not every depth opens up in real time — some things need pressure, darkness and time to come into being.' },
+                  tags: { de: 'Tiefe · Weite · Stille', en: 'Depth · Vastness · Silence' } },
+          images: ['assets/img/cases/eigenzeit/ez-02-ocean.jpg'] },
+
+        { note: { label: { de: 'N° 07 — Manches Wachstum lässt sich nicht beschleunigen.',
+                           en: 'N° 07 — Some growth cannot be accelerated.' },
+                  text: { de: 'Ein Wald wächst nicht schneller, nur weil man ihn drängt. Unter der Oberfläche verständigen sich Wurzeln über Jahrzehnte — ein System, das Geduld nicht kennt, weil es sie nicht braucht.',
+                           en: 'A forest does not grow faster for being pushed. Beneath the surface, roots communicate across decades — a system that knows no patience because it needs none.' },
+                  tags: { de: 'Wurzeln · Stille · Zeit', en: 'Roots · Silence · Time' } },
+          images: ['assets/img/cases/eigenzeit/ez-04-wald.jpg'] },
+
+        { note: { label: { de: 'N° 08 — Manche Reife lässt sich nicht erzwingen.',
+                           en: 'N° 08 — Some ripeness cannot be forced.' },
+                  text: { de: 'Ein Kornfeld braucht seine Zeit zwischen Aussaat und Ernte — jeder Versuch, sie zu verkürzen, verändert nur das Ergebnis, nicht die Wartezeit.',
+                           en: 'A cornfield needs its time between sowing and harvest — every attempt to shorten it changes only the outcome, not the waiting.' },
+                  tags: { de: 'Reife · Geduld · Licht', en: 'Ripeness · Patience · Light' } },
+          images: ['assets/img/cases/eigenzeit/ez-03-feld.jpg'] }
+      ]
+    },
+
+    safsbeta: {
+      eyebrow: { de: 'Editorial Design · Design System · Print Design · AI Art Direction', en: 'Editorial design · Design system · Print design · AI art direction' },
+      title: { de: 'Ein System für viele Ausbildungen.', en: 'One System for Many Programmes.' },
+      intro: {
+        de: 'Ein modulares Broschürensystem für unterschiedliche Ausbildungsinhalte — von der Vorlage über die Bildwelt bis zur fertigen Broschüre.',
+        en: 'A modular brochure system for different fields of training — from the template through the imagery to the finished brochure.'
+      },
+      services: [
+        { label: 'Editorial Design',
+          items: { de: ['Layout & Raster', 'Typografie', 'Informationsarchitektur'],
+                   en: ['Layout & Grid', 'Typography', 'Information Architecture'] } },
+
+        { label: 'Design System',
+          items: { de: ['Broschürenvorlage', 'Wiederkehrende Module', 'Dark- und Light-Variante'],
+                   en: ['Brochure Template', 'Recurring Modules', 'Dark and Light Variant'] } },
+
+        { label: 'Print Design',
+          items: { de: ['Broschüren', 'Druckvorlage'],
+                   en: ['Brochures', 'Print Artwork'] } },
+
+        { label: 'AI Art Direction',
+          items: { de: ['Key-Visual-Bildwelt', 'Generative KI', 'Bildwelt je Variante'],
+                   en: ['Key Visual Imagery', 'Generative AI', 'Imagery per Variant'] } }
+      ],
+      hero: 'assets/img/cases/sb/sb-geraete.jpg',
+      sections: [
+
+        { note: { label: { de: 'Eine Vorlage für viele Ausbildungen', en: 'One template for many programmes' },
+                  text: { de: 'SAFS & BETA bildet in sehr vielen Bereichen aus — Fitness, Group, Yoga, Pilates, Ernährung, Gesundheit. Statt für jede Ausbildung eine eigene Broschüre zu gestalten, entstand eine wiederverwendbare Vorlage.',
+                          en: 'SAFS & BETA trains across a wide range of fields — fitness, group, yoga, pilates, nutrition, health. Instead of designing a separate brochure for each programme, the work produced one reusable template.' } },
+          gruppe: ['assets/img/cases/sb/sb-at-01.jpg', 'assets/img/cases/sb/sb-an-01.jpg'] },
+
+        { note: { label: { de: 'Eine Vorlage. Zwei Varianten.', en: 'One template. Two variants.' },
+                  text: { de: 'Dieselbe Seite als Dark und als Light. Dark trägt Fitness und leistungsorientierte Ausbildungen, Light steht für Ernährung, Yoga und Pilates. Dazu eine eigenständige Key-Visual-Bildwelt mit generativer KI — je Variante eine eigene Tonalität. Die Inhalte wechseln, die gestalterische Logik bleibt.',
+                          en: 'The same page as dark and as light. Dark carries fitness and performance-oriented programmes, light stands for nutrition, yoga and pilates. Alongside it a distinct key-visual imagery world developed with generative AI — its own tonality per variant. The content changes, the design logic stays.' } },
+          gruppe: ['assets/img/cases/sb/sb-at-07.jpg', 'assets/img/cases/sb/sb-an-07.jpg'] },
+
+        { note: { label: { de: 'Kapitelmarken', en: 'Chapter markers' },
+                  text: { de: 'Große, senkrecht gestellte Kapitelwörter gliedern jede Broschüre. Sie liegen immer an derselben Stelle und machen den Aufbau schon beim Durchblättern lesbar.',
+                          en: 'Large, vertically set chapter words structure every brochure. They always sit in the same place and make the build-up readable while flicking through.' } },
+          gruppe: ['assets/img/cases/sb/sb-at-02.jpg', 'assets/img/cases/sb/sb-at-03.jpg', 'assets/img/cases/sb/sb-at-14.jpg'] },
+
+        { note: { label: { de: 'Wiederkehrende Module', en: 'Recurring modules' },
+                  text: { de: 'Hakenlisten, Zertifikatsflächen, Preis- und Eckdatenblöcke, Call-to-Action-Elemente — feste Bausteine, die in jeder Ausbildung gleich funktionieren. Gesetzt in Gotham über alle Ebenen.',
+                          en: 'Checklists, certification panels, price and key-fact blocks, call-to-action elements — fixed building blocks that work the same way in every programme. Set in Gotham throughout.' } },
+          gruppe: ['assets/img/cases/sb/sb-at-04.jpg', 'assets/img/cases/sb/sb-at-05.jpg', 'assets/img/cases/sb/sb-at-08.jpg'] },
+
+        { note: { label: { de: 'Erfolgsgeschichten', en: 'Success stories' },
+                  text: { de: 'Zwei Porträts pro Broschüre, immer im gleichen Aufbau: Zitat und Name auf der dunklen Fläche links, der Bericht rechts im Satzspiegel.',
+                          en: 'Two portraits per brochure, always built the same way: quote and name on the dark panel at left, the story set in the text column at right.' } },
+          gruppe: ['assets/img/cases/sb/sb-at-09.jpg', 'assets/img/cases/sb/sb-at-10.jpg'] },
+
+        { images: ['assets/img/cases/sb/sb-faecher.jpg'] },
+
+        { readers: [
+            { id: 'sb-athletik',
+              label: { de: 'Athletik Trainer — 15 Seiten', en: 'Athletic Trainer — 15 pages' },
+              hinweis: { de: 'Originalbroschüre ansehen', en: 'View the original brochure' },
+              cover: 'assets/img/cases/sb/sb-at-01.jpg',
+              seiten: ['assets/img/cases/sb/sb-at-01.jpg', 'assets/img/cases/sb/sb-at-02.jpg', 'assets/img/cases/sb/sb-at-03.jpg', 'assets/img/cases/sb/sb-at-04.jpg', 'assets/img/cases/sb/sb-at-05.jpg',
+                      'assets/img/cases/sb/sb-at-06.jpg', 'assets/img/cases/sb/sb-at-07.jpg', 'assets/img/cases/sb/sb-at-08.jpg', 'assets/img/cases/sb/sb-at-09.jpg', 'assets/img/cases/sb/sb-at-10.jpg',
+                      'assets/img/cases/sb/sb-at-11.jpg', 'assets/img/cases/sb/sb-at-12.jpg', 'assets/img/cases/sb/sb-at-13.jpg', 'assets/img/cases/sb/sb-at-14.jpg', 'assets/img/cases/sb/sb-at-15.jpg'] },
+            { id: 'sb-anatomie',
+              label: { de: 'Anatomie — 15 Seiten', en: 'Anatomy — 15 pages' },
+              hinweis: { de: 'Originalbroschüre ansehen', en: 'View the original brochure' },
+              cover: 'assets/img/cases/sb/sb-an-01.jpg',
+              seiten: ['assets/img/cases/sb/sb-an-01.jpg', 'assets/img/cases/sb/sb-an-02.jpg', 'assets/img/cases/sb/sb-an-03.jpg', 'assets/img/cases/sb/sb-an-04.jpg', 'assets/img/cases/sb/sb-an-05.jpg',
+                      'assets/img/cases/sb/sb-an-06.jpg', 'assets/img/cases/sb/sb-an-07.jpg', 'assets/img/cases/sb/sb-an-08.jpg', 'assets/img/cases/sb/sb-an-09.jpg', 'assets/img/cases/sb/sb-an-10.jpg',
+                      'assets/img/cases/sb/sb-an-11.jpg', 'assets/img/cases/sb/sb-an-12.jpg', 'assets/img/cases/sb/sb-an-13.jpg', 'assets/img/cases/sb/sb-an-14.jpg', 'assets/img/cases/sb/sb-an-15.jpg'] } ] },
+
+        { cta: { text: { de: 'Mehr Ausbildungen entdecken', en: 'Explore more programmes' },
+                 label: { de: 'SAFS & BETA Ausbildungen', en: 'SAFS & BETA programmes' },
+                 href: 'https://www.safs-beta.de/ausbildungen.html' } }
+      ]
+    },
+
+
+    aquares: {
+      eyebrow: { de: 'Editorial · Konzeptbuch & Markenentwicklung', en: 'Editorial · Concept book & brand development' },
+      title: { de: 'AQUARES — Genuss mit Stil.', en: 'AQUARES — Dining with style.' },
+      intro: {
+        de: 'AQUARES ist ein Restaurantkonzept im Aquarium: Der Gastraum wird von drei Seiten von Wasser umschlossen. Das Konzeptbuch führt die gesamte Entwicklung zusammen — von der Standortanalyse über Zielgruppen und Positionierung bis zu Logo und Innenraum.',
+        en: 'AQUARES is a restaurant concept inside an aquarium: the dining room is enclosed by water on three sides. The concept book brings the entire development together — from location analysis through audiences and positioning to logo and interior.'
+      },
+      services: [
+        { label: 'Strategy',
+          items: { de: ['Standortanalyse', 'Zielgruppenanalyse', 'Positionierung'],
+                   en: ['Location Analysis', 'Audience Analysis', 'Positioning'] } },
+
+        { label: 'Identity',
+          items: { de: ['Markenentwicklung', 'Logo & Signet', 'Farb- & Formkonzept'],
+                   en: ['Brand Development', 'Logo & Mark', 'Colour & Form Concept'] } },
+
+        { label: 'Editorial',
+          items: { de: ['Konzeptbuch', 'Layout & Raster', 'Typografie', 'Informationsgrafik'],
+                   en: ['Concept Book', 'Layout & Grid', 'Typography', 'Information Graphics'] } },
+
+        { label: 'Visualisation',
+          items: { de: ['Handzeichnung', 'Rendering', 'Innenraumvisualisierung'],
+                   en: ['Hand Drawing', 'Rendering', 'Interior Visualisation'] } }
+      ],
+      hero: 'assets/img/cases/aquares/cy-aquares-01-cover.jpg',
+      sections: [
+        { note: { label: { de: 'Aufbau', en: 'Structure' },
+                  text: { de: 'Das Buch ist als Argumentationskette angelegt: Jedes Kapitel baut auf dem vorigen auf, damit die gestalterischen Entscheidungen am Ende nicht behauptet, sondern hergeleitet sind.',
+                          en: 'The book is built as a chain of reasoning: each chapter builds on the previous one, so the design decisions at the end are derived rather than asserted.' } },
+          images: ['assets/img/cases/aquares/cy-aquares-02-inhalt.jpg'] },
+
+        { note: { label: { de: 'Zeichnung als Argument', en: 'Drawing as argument' },
+                  text: { de: 'Statt eines Renderings aus dem Rechner steht hier die Handzeichnung. Sie zeigt das Gebäude als Idee, nicht als fertiges Produkt — und lässt der Betrachtung bewusst Raum.',
+                          en: 'Instead of a computer rendering, the hand drawing takes the stage. It shows the building as an idea, not a finished product — deliberately leaving room for interpretation.' } },
+          images: ['assets/img/cases/aquares/cy-aquares-03-architektur.jpg'] },
+
+        { note: { label: { de: 'Zielgruppen', en: 'Audiences' },
+                  text: { de: 'Drei Personas tragen die Argumentation. Das Layout ist für alle drei identisch aufgebaut, damit sich die Profile direkt vergleichen lassen — nur Bild und Text wechseln.',
+                          en: 'Three personas carry the reasoning. The layout is identical for all three so the profiles can be compared directly — only image and text change.' } },
+          images: ['assets/img/cases/aquares/cy-aquares-04-persona-a.jpg', 'assets/img/cases/aquares/cy-aquares-05-persona-b.jpg', 'assets/img/cases/aquares/cy-aquares-06-persona-c.jpg'] },
+
+        { note: { label: { de: 'Positionierung', en: 'Positioning' },
+                  text: { de: 'Das Positionierungskreuz setzt AQUARES gegen den Wettbewerb. Reduziert auf zwei Achsen und wenige Punkte — die Aussage soll in Sekunden lesbar sein.',
+                          en: 'The positioning cross sets AQUARES against the competition. Reduced to two axes and a few points — the statement should be readable in seconds.' } },
+          images: ['assets/img/cases/aquares/cy-aquares-07-positionierung.jpg'] },
+
+        { images: ['assets/img/cases/aquares/cy-aquares-08-interior.jpg'] },
+
+        { note: { label: { de: 'Signet', en: 'The mark' },
+                  text: { de: 'Das Logo greift die Rahmung des Gastraums auf: eine offene Klammer, darunter ein abstrahierter Fisch. Weite Sperrung in den Versalien gibt der Marke die nötige Ruhe.',
+                          en: 'The logo picks up the framing of the dining room: an open bracket with an abstracted fish beneath. Wide letterspacing in the capitals gives the brand its necessary calm.' } },
+          images: ['assets/img/cases/aquares/cy-aquares-09-logo.jpg'] },
+
+        { note: { label: { de: 'Gemeinsam stärker.', en: 'Stronger together.' },
+                  text: { de: 'AQUARES entstand als Gruppenprojekt während meines Studiums. Besonders in Erinnerung geblieben ist mir die Zusammenarbeit: Jeder brachte seine eigenen Stärken ein und übernahm Verantwortung für seinen Bereich. Genau diese Verbindung aus unterschiedlichen Perspektiven und Fähigkeiten macht für mich gute Teamarbeit aus.',
+                          en: 'AQUARES was a group project during my studies. What stayed with me most was the collaboration: everyone brought their own strengths and took responsibility for their part. That combination of different perspectives and skills is what good teamwork means to me.' } },
+          images: ['assets/img/cases/aquares/cy-aquares-12-team.jpg'] },
+
+        { images: ['assets/img/cases/aquares/cy-aquares-13-protokoll.jpg'] }
+      ]
+    },
+
+    yoga: {
+      eyebrow: { de: 'Branding · Design System & Brandbook', en: 'Branding · Design system & brandbook' },
+      title: { de: 'Online Yoga Akademie — Markenidentität.', en: 'Online Yoga Academy — Brand Identity.' },
+      intro: {
+        de: 'Die Online Yoga Akademie der Dr. Bergmann Group brauchte ein Markensystem, das vom Lernbereich bis zur Verkaufsseite trägt. Entstanden ist ein Brandbook, das Logo, Farben, Typografie und grafische Elemente verbindlich festlegt — ruhig, warm und erdverbunden.',
+        en: 'The Online Yoga Academy of Dr. Bergmann Group needed a brand system that holds from the learning area through to the sales page. The result is a brandbook defining logo, colour, typography and graphic elements as binding rules — calm, warm and grounded.'
+      },
+      services: [
+        { label: 'Identity',
+          items: { de: ['Logogestaltung', 'Schutzraum & Formate', 'Favicon'],
+                   en: ['Logo Design', 'Clear Space & Formats', 'Favicon'] } },
+
+        { label: 'Design System',
+          items: { de: ['Farbsystem', 'Typografie', 'Grafische Elemente', 'Bildsprache'],
+                   en: ['Colour System', 'Typography', 'Graphic Elements', 'Visual Language'] } },
+
+        { label: 'Guidelines',
+          items: { de: ['Brandbook', 'Anwendungsregeln'],
+                   en: ['Brandbook', 'Usage Rules'] } },
+
+        { label: 'Application',
+          items: { de: ['App & Web', 'Landingpages', 'Kampagnenmotive', 'Out-of-Home'],
+                   en: ['App & Web', 'Landing Pages', 'Campaign Motifs', 'Out-of-Home'] } }
+      ],
+      hero: 'assets/img/cases/oya/oya-01-cover.jpg',
+      sections: [
+
+        { note: { label: { de: 'Wortmarke und Formate', en: 'Wordmark and formats' },
+                  text: { de: 'Die Marke tritt in drei Ausbaustufen auf: Hauptlogo quer, verkürztes Signet und die Bildmarke allein — je nach verfügbarem Platz.',
+                          en: 'The brand appears in three levels: full horizontal logo, shortened signet and the symbol on its own — depending on the space available.' } },
+          images: ['assets/img/cases/oya/oya-02-logo.jpg', 'assets/img/cases/oya/oya-03-formate.jpg'] },
+
+        { note: { label: { de: 'Schutzraum', en: 'Clear space' },
+                  text: { de: 'Der Schutzraum entspricht der Breite des „O“ aus der Wortmarke und darf auf keiner Seite unterschritten werden — weder durch Text noch durch Bilder oder grafische Elemente.',
+                          en: 'The clear space equals the width of the “O” in the wordmark and may not be reduced on any side — neither by text nor by images or graphic elements.' } },
+          images: ['assets/img/cases/oya/oya-04-schutzraum.jpg'] },
+
+        { note: { label: { de: 'Farbsystem', en: 'Colour system' },
+                  text: { de: 'Drei Primärfarben tragen die Marke, ein violetter Akzent setzt Spitzen. Dazu eine neutrale Basis für Text und Flächen.',
+                          en: 'Three primary colours carry the brand, a violet accent sets the highlights, with a neutral base for text and surfaces.' },
+                  tags: { de: '#F6F0E7 · #DDA597 · #8F6E5B · #9D8BD2', en: '#F6F0E7 · #DDA597 · #8F6E5B · #9D8BD2' } },
+          images: ['assets/img/cases/oya/oya-05-farben.jpg'] },
+
+        { note: { label: { de: 'Favicon', en: 'Favicon' },
+                  text: { de: 'Das Favicon greift ausschließlich die Bildmarke auf — das stilisierte Yoga-Symbol im Kreis, auf warmem Braun und mit abgerundeten Ecken.',
+                          en: 'The favicon uses the symbol alone — the stylised yoga mark in a circle, on warm brown with rounded corners.' } },
+          images: ['assets/img/cases/oya/oya-06-favicon.jpg'] },
+
+        { note: { label: { de: 'Typografie', en: 'Typography' },
+                  text: { de: 'Montserrat für die Überschriften, Plus Jakarta Sans für Fließtext und Bildunterschriften. Zwei Schnitte, klar getrennte Aufgaben.',
+                          en: 'Montserrat for headlines, Plus Jakarta Sans for body text and captions. Two faces, clearly separated jobs.' } },
+          images: ['assets/img/cases/oya/oya-07-typografie.jpg'] },
+
+        { note: { label: { de: 'Organische Flächen', en: 'Organic shapes' },
+                  text: { de: 'Die geschwungenen Flächen orientieren sich an Bewegung und Atmung im Yoga. Übereinandergelegt erzeugen sie Tiefe und Wärme, ohne konstruiert zu wirken.',
+                          en: 'The flowing shapes take their cue from movement and breath in yoga. Layered over one another they create depth and warmth without looking constructed.' } },
+          images: ['assets/img/cases/oya/oya-08-flaechen.jpg'] },
+
+        { note: { label: { de: 'Saisonale Akzente', en: 'Seasonal accents' },
+                  text: { de: 'Drei Sekundärfarben ergänzen die Palette — ausdrücklich nur für Sales- und Landingpages, als Ergänzung und nicht als Ersatz.',
+                          en: 'Three secondary colours extend the palette — explicitly for sales and landing pages only, as an addition and not a replacement.' } },
+          images: ['assets/img/cases/oya/oya-09-akzente.jpg', 'assets/img/cases/oya/oya-10-akzente-app.jpg'] },
+
+        { note: { label: { de: 'Anwendung', en: 'Application' },
+                  text: { de: 'Vom Lernbereich über Plakat und Geschäftsausstattung bis zur Kampagne: Das System trägt in jedem Format — und bleibt auch dort ruhig, wo verkauft wird.',
+                          en: 'From the learning area through poster and stationery to the campaign: the system holds in every format — and stays calm even where it sells.' } },
+          images: ['assets/img/cases/oya/oya-11-geraete.jpg', 'assets/img/cases/oya/oya-12-plakat.jpg', 'assets/img/cases/oya/oya-13-anwendungen.jpg'] },
+
+        { images: ['assets/img/teaser/w-yoga-kampagne.jpg'] }
+      ]
+    },
+
+    avelura: {
+      eyebrow: { de: 'Print · Editorial & Geschäftsausstattung', en: 'Print · Editorial & brand applications' },
+      title: { de: 'Print & Geschäftsausstattung.', en: 'Print & Brand Applications.' },
+      intro: {
+        de: 'Eine Auswahl verschiedener Printarbeiten für unterschiedliche Marken und Unternehmen — von Broschüren und Flyern bis hin zu Geschäftsausstattung und physischen Markenanwendungen.',
+        en: 'A selection of print work for different brands and companies — from brochures and flyers through to stationery and physical brand applications.'
+      },
+      services: [
+        { label: 'Concept',
+          items: { de: ['Konzeption', 'Informationsstruktur', 'Art Direction'],
+                   en: ['Concept Development', 'Information Structure', 'Art Direction'] } },
+
+        { label: 'Editorial',
+          items: { de: ['Broschürendesign', 'Layout & Raster', 'Typografie'],
+                   en: ['Brochure Design', 'Layout & Grid', 'Typography'] } },
+
+        { label: 'Print',
+          items: { de: ['Flyer', 'Broschüren', 'Falzkonzept', 'Druckproduktion'],
+                   en: ['Flyers', 'Brochures', 'Fold Concept', 'Print Production'] } },
+
+        { label: 'Brand Applications',
+          items: { de: ['Geschäftsausstattung', 'Dienstausweise', 'Briefmarken'],
+                   en: ['Stationery', 'ID Cards', 'Stamps'] } }
+      ],
+      sections: [
+
+        { chapter: { num: '01',
+                     title: { de: 'Avelura', en: 'Avelura' },
+                     sub: { de: 'Flyer & Packaging Communication', en: 'Flyer & packaging communication' },
+                     text: { de: 'Avelura befindet sich noch im Aufbau. Für die geplante Produkt- und Packaging-Kommunikation entstand ein erster Flyer, der die Marke und ihre Produkte visuell zusammenführt.',
+                              en: 'Avelura is still being built up. For the planned product and packaging communication, a first flyer brings the brand and its products together visually.' } },
+          images: ['assets/img/cases/print/pr-avelura-flyer.jpg'] },
+
+        { chapter: { num: '02',
+                     title: { de: 'MPU Beratungsstelle', en: 'MPU Beratungsstelle' },
+                     sub: { de: 'Broschüre & Geschäftsausstattung', en: 'Brochure & brand applications' },
+                     text: { de: 'Für die MPU Beratungsstelle entstand eine umfassende Printausstattung. Dazu gehören eine Broschüre sowie verschiedene Anwendungen der visuellen Identität, darunter Dienstausweise und weitere Geschäftsmaterialien.',
+                              en: 'A comprehensive set of print materials was developed for MPU Beratungsstelle. It includes a brochure as well as various applications of the visual identity, among them staff ID cards and further business materials.' } },
+          images: ['assets/img/cases/print/pr-mpu-broschuere.jpg'] },
+
+        { note: { label: { de: 'Dienstausweise', en: 'Staff ID cards' },
+                  text: { de: 'Vorder- und Rückseite tragen dieselbe diagonale Teilung: oben die Marke, unten die Information. Die Rückseite führt Kontakt und einen QR-Code zur Prüfung der Teamzugehörigkeit.',
+                          en: 'Front and back share the same diagonal division: the brand above, the information below. The reverse carries contact details and a QR code for verifying team membership.' } },
+          images: ['assets/img/cases/print/pr-mpu-dienstausweise.jpg'] },
+
+        { note: { label: { de: 'Briefmarken', en: 'Stamps' },
+                  text: { de: 'Das Signet der Beratungsstelle als Marke im Wortsinn — reduziert auf Fahrzeug, Straße und Jahreszahl.',
+                          en: 'The agency’s mark as a stamp in the literal sense — reduced to vehicle, road and year.' } },
+          images: ['assets/img/cases/print/pr-mpu-briefmarken.jpg'] }
+      ]
+    }
+  };
+
+  /* ---------- Case-Study-Ansicht ---------- */
+  const caseView     = document.getElementById('caseView');
+  const caseHero     = document.getElementById('caseHero');
+  const caseClose    = document.getElementById('caseClose');
+  const caseBackBtn  = document.getElementById('caseBack');
+  const elTitle      = document.getElementById('caseTitle');
+  const elIntro      = document.getElementById('caseIntro');
+  const elServices   = document.getElementById('caseServices');
+  const elBody       = document.getElementById('caseBody');
+
+  let currentProject = null;
+  let lastTrigger = null;
+  const leseStoff = {};   // id -> Broschürendaten des offenen Projekts
+
+  function tr(value){
+    if (!value) return '';
+    return value[currentLang] || value.de || '';
+  }
+
+  function renderCase(){
+    if (!currentProject) return;
+    const p = currentProject;
+
+    elTitle.textContent = tr(p.title);
+    elIntro.textContent = tr(p.intro);
+
+    // Leistungen nach Kategorien — je Projekt eigene Gruppen, gleiche Darstellung
+    elServices.innerHTML = (p.services || []).map(gr => {
+      const posten = (gr.items ? (gr.items[currentLang] || gr.items.de) : []) || [];
+      return '<div class="case-sgroup"><h4>' + gr.label + '</h4><ul>'
+           + posten.map(x => '<li>' + x + '</li>').join('')
+           + '</ul></div>';
+    }).join('');
+
+    // Alle Abbildungen laufen in einer Spalte, jede behält ihr echtes
+    // Seitenverhältnis. Eine Notiz unter einem Bild ist optional und
+    // wechselt bei jedem Auftreten die Seite.
+    const teile = [];
+    if (p.hero) teile.push({ src: p.hero });
+    (p.sections || []).forEach(sec => {
+      if (sec.chapter) teile.push({ chapter: sec.chapter });
+      if (sec.readers) teile.push({ readers: sec.readers });
+      if (sec.gruppe)  teile.push({ gruppe: sec.gruppe, note: sec.note });
+      if (sec.cta)     teile.push({ cta: sec.cta });
+      if (sec.summary) teile.push({ summary: sec.summary });
+      (sec.images || []).forEach((src, i) => {
+        if (teile.some(t => t.src === src)) return;
+        teile.push({ src: src, note: i === 0 ? sec.note : null });
+      });
+    });
+
+    let notizNr = 0;
+    elBody.innerHTML = teile.map(t => {
+      if (t.chapter) {
+        return '<div class="case-chapter"><div>'
+             + '<p class="case-chapter-num">' + t.chapter.num + '</p>'
+             + '<h3 class="case-chapter-title">' + tr(t.chapter.title) + '</h3>'
+             + (t.chapter.sub ? '<p class="case-chapter-sub">' + tr(t.chapter.sub) + '</p>' : '')
+             + '</div><p class="case-chapter-text">' + tr(t.chapter.text) + '</p></div>';
+      }
+      if (t.readers) {
+        return '<div class="case-readers">' + t.readers.map(r => {
+          leseStoff[r.id] = r;
+          return '<button type="button" class="reader-trigger" data-reader="' + r.id + '">'
+            + '<span class="rd-device"><span class="rd-screen">'
+            + '<img src="' + r.cover + '" alt="" loading="lazy"></span></span>'
+            + '<span class="reader-hint">' + tr(r.hinweis)
+            + '<svg viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M3 11L11 3M11 3H4.5M11 3V9.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+            + '</span></button>';
+        }).join('') + '</div>';
+      }
+      if (t.gruppe) {
+        const n = Math.min(3, t.gruppe.length);
+        let g = '<div class="case-group is-' + n + '">'
+              + t.gruppe.map(src => '<img src="' + src + '" alt="" loading="lazy">').join('')
+              + '</div>';
+        if (t.note) {
+          const seite = (notizNr++ % 2 === 0) ? '' : ' is-left';
+          g += '<div class="case-caption' + seite + '"><div>'
+             + '<h3>' + tr(t.note.label) + '</h3>'
+             + '<p>' + tr(t.note.text) + '</p></div></div>';
+        }
+        return g;
+      }
+      if (t.cta) {
+        return '<div class="case-cta">'
+          + '<p>' + tr(t.cta.text) + '</p>'
+          + '<a class="btn btn-solid" href="' + t.cta.href + '" target="_blank" rel="noopener">'
+          + tr(t.cta.label) + ' <span aria-hidden="true">↗</span></a>'
+          + '</div>';
+      }
+      let html = '<figure class="case-figure"><img src="' + t.src + '" alt="" loading="lazy"></figure>';
+      if (t.note) {
+        const seite = (notizNr++ % 2 === 0) ? '' : ' is-left';
+        html += '<div class="case-caption' + seite + '"><div>'
+              + '<h3>' + tr(t.note.label) + '</h3>'
+              + '<p>' + tr(t.note.text) + '</p>'
+              + (t.note.tags ? '<p class="tags">' + tr(t.note.tags) + '</p>' : '')
+              + '</div></div>';
+      }
+      return html;
+    }).join('');
+  }
+
+  function openProject(id, cardEl){
+    if (!projects[id]) return;
+    currentProject = projects[id];
+    renderCase();
+
+    if (cardEl) lastTrigger = cardEl;
+
+    caseView.scrollTop = 0;
+    caseView.classList.add('open');
+    caseView.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+    requestAnimationFrame(() => {
+      caseView.classList.add('is-visible');
+      caseClose.classList.remove('on-light');
+      caseClose.focus({ preventScroll: true });
+    });
+  }
+
+  function closeProject(){
+    caseView.classList.remove('is-visible');
+    caseView.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+    setTimeout(() => {
+      if (!caseView.classList.contains('is-visible')) caseView.classList.remove('open');
+    }, 450);
+
+    if (lastTrigger) { lastTrigger.focus({ preventScroll: true }); lastTrigger = null; }
+  }
+
+  // Schließen-Button wechselt die Farbe, sobald der helle Teil beginnt
+  caseView.addEventListener('scroll', () => {
+    if (!caseHero) return;
+    const heroBottom = caseHero.offsetHeight - 60;
+    caseClose.classList.toggle('on-light', caseView.scrollTop > heroBottom);
+  }, { passive: true });
+
+  caseClose.addEventListener('click', closeProject);
+  if (caseBackBtn) caseBackBtn.addEventListener('click', closeProject);
+  /* ---------- Broschüren-Reader ----------
+     Öffnet die echten Seiten als senkrecht scrollbare Ansicht über der Projektansicht.
+     Kein neues Fenster, kein Download, kein automatischer Ablauf. */
+  const readerView  = document.getElementById('readerView');
+  const readerPages = document.getElementById('readerPages');
+  const readerLabel = document.getElementById('readerLabel');
+  const readerClose = document.getElementById('readerClose');
+  const readerCount = document.getElementById('readerCount');
+  let readerAusloeser = null;
+  let readerOffen = false;
+  let readerSeiten = 0;
+
+  function zaehlerAktualisieren(){
+    if (!readerCount || !readerSeiten) return;
+    const h = readerPages.scrollHeight - readerPages.clientHeight;
+    const t = h > 0 ? readerPages.scrollTop / h : 0;
+    const nr = Math.min(readerSeiten, Math.max(1, Math.round(t * (readerSeiten - 1)) + 1));
+    readerCount.textContent = nr + ' / ' + readerSeiten;
+  }
+
+  function readerOeffnen(id, ausloeser){
+    const r = leseStoff[id];
+    if (!r || !readerView) return;
+    readerAusloeser = ausloeser || null;
+    readerOffen = true;
+    readerLabel.textContent = tr(r.label);
+    readerView.setAttribute('aria-label', tr(r.label));
+    // Seiten erst beim Öffnen aufbauen; die ersten beiden sofort, der Rest lazy
+    readerPages.innerHTML = r.seiten.map((src, i) =>
+      '<img class="reader-page" src="' + src + '" alt="" ' +
+      (i < 2 ? '' : 'loading="lazy" ') + 'draggable="false">').join('');
+    readerView.classList.add('open');
+    readerView.setAttribute('aria-hidden','false');
+    caseView.classList.add('reader-offen');
+    readerSeiten = r.seiten.length;
+    zaehlerAktualisieren();
+    requestAnimationFrame(() => {
+      readerPages.scrollTop = 0;
+      zaehlerAktualisieren();
+      readerView.classList.add('is-visible');
+      readerClose.focus();
+    });
+  }
+
+  function readerSchliessen(){
+    if (!readerOffen) return;
+    readerOffen = false;
+    readerView.classList.remove('is-visible');
+    readerView.setAttribute('aria-hidden','true');
+    caseView.classList.remove('reader-offen');
+    const fertig = () => {
+      readerView.classList.remove('open');
+      readerPages.innerHTML = '';
+    };
+    setTimeout(fertig, 360);
+    if (readerAusloeser && typeof readerAusloeser.focus === 'function') readerAusloeser.focus();
+    readerAusloeser = null;
+  }
+
+  if (readerPages) readerPages.addEventListener('scroll', () => {
+    if (zaehlerLaeuft) return;
+    zaehlerLaeuft = true;
+    requestAnimationFrame(() => { zaehlerAktualisieren(); zaehlerLaeuft = false; });
+  }, { passive: true });
+  let zaehlerLaeuft = false;
+
+  if (readerClose) readerClose.addEventListener('click', readerSchliessen);
+  // Klick neben die Seiten schließt ebenfalls
+  if (readerView) readerView.addEventListener('click', (e) => {
+    if (e.target === readerView) readerSchliessen();
+  });
+  // Auslöser werden erst beim Rendern erzeugt — deshalb Delegation
+  document.addEventListener('click', (e) => {
+    const t = e.target;
+    if (!t || typeof t.closest !== 'function') return;
+    const btn = t.closest('.reader-trigger');
+    if (btn) readerOeffnen(btn.dataset.reader, btn);
+  });
+
+  document.addEventListener('keydown', e => {
+    // auf "open" prüfen, nicht auf "is-visible" — sonst greift Escape
+    // im ersten Moment nach dem Öffnen noch nicht
+    if (e.key !== 'Escape') return;
+    if (readerOffen) { readerSchliessen(); return; }
+    if (caseView.classList.contains('open')) closeProject();
+  });
+
+  // wird auch von den geklonten Karussell-Kacheln aufgerufen
+  window.__openProject = openProject;
+  window.__renderCase  = renderCase;
+
+  /* Ein einziger Listener am Dokument statt einer pro Kachel.
+     Wichtig: Das Karussell erzeugt laufend Klone — die werden hierüber
+     automatisch mit abgedeckt, ohne dass sie einzeln verdrahtet werden müssen. */
+  function activateCard(e){
+    const t = e.target;
+    if (!t || typeof t.closest !== 'function') return;   // z.B. wenn das Ziel kein Element ist
+    const card = t.closest('[data-gallery]');
+    if (!card) return;
+    if (e.type === 'keydown') {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      e.preventDefault();
+    }
+    openProject(card.dataset.gallery, card);
+  }
+  document.addEventListener('click', activateCard);
+  document.addEventListener('keydown', activateCard);
+</script>
+
+<script>
+  // topbar glass effect on scroll
+  const topbarEl = document.querySelector('.topbar');
+  function updateTopbarGlass(){
+    topbarEl.classList.toggle('scrolled', window.scrollY > 8);
+  }
+  updateTopbarGlass();
+  window.addEventListener('scroll', updateTopbarGlass, { passive: true });
+
+  // mobile nav toggle
+  const navToggle = document.getElementById('navToggle');
+  const sideNav = document.getElementById('sideNav');
+  navToggle.addEventListener('click', () => sideNav.classList.toggle('open'));
+  sideNav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => sideNav.classList.remove('open')));
+
+  // Sprungnavigation etwas ruhiger als der Browser-Standard.
+  // Betrifft ausschließlich Klicks auf Anker — das normale Scrollen
+  // mit Rad oder Trackpad bleibt unverändert nativ.
+  (function(){
+    const DURATION = 900;                 // ms; Browser-Standard liegt spürbar darunter
+    const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function easeInOutCubic(t){
+      return t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t + 2, 3) / 2;
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(link => {
+      link.addEventListener('click', e => {
+        const id = link.getAttribute('href');
+        if (!id || id === '#') return;
+        const target = document.querySelector(id);
+        if (!target) return;
+
+        e.preventDefault();
+        const startY = window.pageYOffset;
+        const endY = target.getBoundingClientRect().top + startY;
+        const distance = endY - startY;
+
+        if (reduce || Math.abs(distance) < 2) {
+          window.scrollTo(0, endY);
+          history.replaceState(null, '', id);
+          return;
+        }
+
+        const t0 = performance.now();
+        function step(now){
+          const p = Math.min((now - t0) / DURATION, 1);
+          window.scrollTo(0, startY + distance * easeInOutCubic(p));
+          if (p < 1) requestAnimationFrame(step);
+          else history.replaceState(null, '', id);
+        }
+        requestAnimationFrame(step);
+      });
+    });
+  })();
+
+  // scroll-spy: highlight active sidenav link
+  const navAnchors = Array.from(sideNav.querySelectorAll('a'));
+  const spySections = navAnchors
+    .map(a => document.querySelector(a.getAttribute('href')))
+    .filter(Boolean);
+  const spyIO = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      const idx = spySections.indexOf(entry.target);
+      if (idx === -1) return;
+      if (entry.isIntersecting) {
+        navAnchors.forEach(a => a.classList.remove('active'));
+        navAnchors[idx].classList.add('active');
+      }
+    });
+  }, { rootMargin: '-45% 0px -50% 0px', threshold: 0 });
+  spySections.forEach(s => spyIO.observe(s));
+
+  /* Hochzählen der Kennzahlen. Im Markup steht bereits die Zielzahl —
+     ohne JavaScript bleibt sie sichtbar, statt "0+" anzuzeigen. */
+  (function(){
+    const band = document.querySelector('.about-stats');
+    if (!band) return;
+    const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduce || !('IntersectionObserver' in window)) return;
+
+    const zahlen = Array.from(band.querySelectorAll('.num'));
+
+    function hochzaehlen(el){
+      const ziel = parseInt(el.dataset.count, 10) || 0;
+      el.textContent = '0';   // erst jetzt auf null setzen, direkt vor der Animation
+      const dauer = 1400, t0 = performance.now();
+      (function step(now){
+        const p = Math.min((now - t0) / dauer, 1);
+        el.textContent = Math.round((1 - Math.pow(1 - p, 3)) * ziel);
+        if (p < 1) requestAnimationFrame(step);
+      })(t0);
+    }
+
+    const io = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (!e.isIntersecting) return;
+        zahlen.forEach(hochzaehlen);
+        io.unobserve(e.target);
+      });
+    }, { threshold: 0.4 });
+    io.observe(band);
+  })();
+
+  /* Roadmap: Schritte werden beim Scrollen nacheinander aktiv — früh fertig,
+     damit der Prozess abgeschlossen ist, bevor "Ausgewählte Arbeiten" erscheint. */
+  (function(){
+    const rm = document.getElementById('roadmap');
+    if (!rm) return;
+    const steps = Array.from(rm.querySelectorAll('.rm-step'));
+    const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (reduce){
+      steps.forEach(st => st.classList.add('is-active'));
+      return;
+    }
+
+    function update(){
+      const r = rm.getBoundingClientRect();
+      const vh = window.innerHeight || 800;
+      // Start: Oberkante erreicht 92% der Viewporthöhe.
+      // Ende: Unterkante hat 72% der Viewporthöhe passiert — deutlich vor der nächsten Section.
+      const p = (vh * 0.92 - r.top) / (r.height + vh * 0.20);
+      const t = Math.min(1, Math.max(0, p));
+      // Schwellen 0 / 0.26 / 0.52 — alle drei stehen bei gut der Hälfte des Wegs.
+      steps.forEach((st, i) => st.classList.toggle('is-active', t >= i * 0.26));
+    }
+
+    let laeuft=false;
+    function onScroll(){
+      if (laeuft) return;
+      laeuft=true;
+      requestAnimationFrame(()=>{ update(); laeuft=false; });
+    }
+    window.addEventListener('scroll', onScroll, { passive:true });
+    window.addEventListener('resize', onScroll);
+    onScroll();
+  })();
+
+  /* Schreibmaschine in der Headline: nur die letzte Phrase wechselt.
+     Ruhiger Rhythmus — schreiben, stehen lassen, löschen, nächster Begriff. */
+  const typeWordsDE = ['visuelle Identitäten.','Kampagnen.','Digital Design.','visuelle Systeme.','Editorial Design.','Printkommunikation.'];
+  const typeWordsEN = ['visual identities.','campaigns.','digital design.','visual systems.','editorial design.','print communication.'];
+  let typeTimer = null;
+
+  function startTyping(){
+    const feld = document.getElementById('typeOut');
+    if (!feld) return;
+    clearTimeout(typeTimer);
+
+    const woerter = (currentLang === 'en') ? typeWordsEN : typeWordsDE;
+    const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduce){ feld.textContent = woerter[0]; return; }
+
+    let i = 0, pos = 0, loeschen = false;
+
+    (function schritt(){
+      const wort = woerter[i];
+      feld.textContent = wort.slice(0, pos);
+
+      let pause;
+      if (!loeschen){
+        if (pos < wort.length){ pos++; pause = 58; }
+        else { loeschen = true; pause = 1900; }          // stehen lassen
+      } else {
+        if (pos > 0){ pos--; pause = 26; }
+        else { loeschen = false; i = (i + 1) % woerter.length; pause = 420; }
+      }
+      typeTimer = setTimeout(schritt, pause);
+    })();
+  }
+
+  // EN/DE language toggle
+  const langToggle = document.getElementById('langToggle');
+  function applyLang(lang){
+    currentLang = lang;
+    document.documentElement.setAttribute('lang', lang);
+    document.querySelectorAll('[data-en]').forEach(el => {
+      if (el.dataset.deCache === undefined) el.dataset.deCache = el.innerHTML;
+      el.innerHTML = lang === 'en' ? el.dataset.en : el.dataset.deCache;
+    });
+    // offene Projektansicht in der neuen Sprache neu aufbauen
+    if (window.__renderCase) window.__renderCase();
+    startTyping();
+    langToggle.textContent = lang === 'de' ? 'EN' : 'DE';
+    try { localStorage.setItem('site-lang', lang); } catch(e){}
+  }
+  langToggle.addEventListener('click', () => applyLang(currentLang === 'de' ? 'en' : 'de'));
+  applyLang(currentLang);
+
+  // fade-in + Trennlinie "zeichnen" beim Scrollen in den Viewport
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.style.opacity = 1;
+        e.target.classList.add('line-in');
+      }
+    });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('section').forEach(s => {
+    s.style.opacity = 0;
+    s.style.transition = 'opacity 1.1s ease';
+    io.observe(s);
+  });
+
+</script>
+
+<script>
+  // Intro: HORTDESIGN-Schriftzug erscheint unten links, steht kurz, löst sich dann
+  // nach oben hin auf (Maske + leichte Unschärfe). Läuft nur einmal pro Browser-Session.
+  (function(){
+    const overlay = document.getElementById('introOverlay');
+    const introLogo = document.getElementById('introLogo');
+    if (!overlay || !introLogo) { if (overlay) overlay.style.display = 'none'; return; }
+
+    const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let alreadySeen = false;
+    try { alreadySeen = sessionStorage.getItem('intro-seen') === '1'; } catch(e){}
+
+    if (reduceMotion || alreadySeen) {
+      overlay.style.display = 'none';
+      return;
+    }
+    try { sessionStorage.setItem('intro-seen', '1'); } catch(e){}
+
+    // Failsafe: Overlay spätestens nach 7s entfernen, falls etwas hängt.
+    const failsafe = setTimeout(() => {
+      overlay.style.display = 'none';
+      document.body.style.overflow = '';
+    }, 7000);
+
+    function wait(ms){ return new Promise(r => setTimeout(r, ms)); }
+
+    document.body.style.overflow = 'hidden';
+
+    (async function run(){
+      await wait(120);
+      introLogo.classList.add('reveal');   // ruhiges Einblenden
+      await wait(850 + 2000);              // Einblendung + ca. 2s Standzeit
+      introLogo.classList.add('dissolve'); // nach oben auflösen (~800ms)
+      await wait(620);
+      overlay.classList.add('hide');       // Overlay ausblenden, überlappt leicht
+      await wait(600);
+      overlay.style.display = 'none';
+      document.body.style.overflow = '';
+      clearTimeout(failsafe);
+    })();
+  })();
+</script>
+
+</body>
+</html>
