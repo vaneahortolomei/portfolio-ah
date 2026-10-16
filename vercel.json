@@ -1,4 +1,16 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
   "cleanUrls": true,
-  "trailingSlash": false
+  "trailingSlash": false,
+  "headers": [
+    {
+      "source": "/assets/files/lebenslauf-alexandru-hortolomei.pdf",
+      "headers": [
+        {
+          "key": "Content-Disposition",
+          "value": "attachment; filename=\"Lebenslauf-Alexandru-Hortolomei.pdf\""
+        }
+      ]
+    }
+  ]
 }
